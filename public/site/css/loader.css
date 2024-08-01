@@ -1,0 +1,69 @@
+.loader-wrap {
+    background:var(--color-main);
+    position: fixed;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    z-index: 999;
+  }
+  
+  .loader {
+    top: 50%;
+    -webkit-transform: translate3d(-50%,-50%, 0);
+    transform: translate3d(-50%,-50%, 0);
+    margin: 0 auto;
+    width: 32px;
+    height: 32px;
+    position: relative;
+  }
+  
+  .cube1,
+  .cube2,
+  .cube3,
+  .cube4,
+  .cube5 {
+    background-color:var(--color-white);
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    top: 20px;
+    left: 0;
+    opacity: 0;
+    
+    -webkit-animation: cubemove 2s infinite ease-in-out;
+    animation: cubemove 2s infinite ease-in-out;
+  }
+  
+  .cube2 {
+    -webkit-animation-delay: -0.5s;
+    animation-delay: -0.5s;
+  }
+  
+  .cube3 {
+    -webkit-animation-delay: -1s;
+    animation-delay: -1s;
+  }
+  
+  .cube4 {
+    -webkit-animation-delay: -1.5s;
+    animation-delay: -1.5s;
+  }
+  .cube5 {
+    -webkit-animation-delay: -2s;
+    animation-delay: -2s;
+  }
+  
+  @keyframes cubemove {
+    0% { 
+      -webkit-transform: translateX(-120px);
+      transform: translateX(-120px);
+    }
+    50% { 
+      -webkit-transform: translateX(0px) rotate(180deg) scale(2.2);       background:var(--color-white);
+      opacity: 1;
+    }
+    100% { 
+      -webkit-transform: translateX(120px);
+      transform: translateX(120px);
+    }
+  }

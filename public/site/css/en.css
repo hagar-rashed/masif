@@ -1,0 +1,122 @@
+body {
+    text-align: left;
+    direction: ltr;
+}
+  
+
+
+
+.icons-top-par  ul{ 
+    justify-content: right;
+}
+
+
+.more-aboutus-index ul li::after {
+    right:auto;
+    left: -7px;
+}
+.more-aboutus-index::after {
+    left: auto;
+    right: 0;
+}
+.more-aboutus-index::before {
+    left: auto;
+    right: 35px;
+}
+.ctm-btn i {
+    transform: scaleX(-1);
+}
+.input-form-footer button {
+    left: auto;
+    right: 0;
+
+border-radius: 0px 5px  5px 0;
+}
+.form-footer input {
+
+    padding-right: 70px;
+    padding-left: 10px;
+}
+.input-form-footer button i{
+        transform: scaleX(-1);
+
+}
+.element-footer h2::after {
+    left: 0;
+    right: auto;
+}
+
+.sub-aboutus:nth-child(even) {
+    direction: rtl;
+}
+.pagination li a i {
+    transform: scaleX(-1);
+}
+li.not-active {
+    transform: scaleX(-1);
+}
+
+.text-sub-jops-details ul li {
+    padding-right: 0px;
+    padding-left: 10px;
+    
+}
+
+.text-sub-jops-details ul li::after {
+    left: 0;
+    right: auto;
+}
+
+.dropdowm-language {
+    left: auto;
+    right:0;
+}
+
+.text-news-details h2::after {
+    left: 0;
+    right: auto;
+}
+
+.title-news::after {
+    left: 0;
+    right: auto;
+}
+
+.form-search button {
+    right: 0;
+    left: auto;
+}
+
+.element_menu_responsive > ul {
+    margin: 0 auto 0 0;
+    padding: 30px 0px 0 50px;
+}
+
+
+.menu_responsive {
+
+    left: 0;
+    right: auto;
+    transform: translateX(-102%);
+}
+
+.menu_responsive {
+    display: none;
+}
+
+.owl-nav {
+    justify-content: start;
+}
+
+.title-start1::after {
+    left: 0;
+    right: auto;
+}
+
+
+@media (max-width: 992px) {
+.menu-div {
+    right: 0;
+    left: auto;
+}
+}

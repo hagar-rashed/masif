@@ -1,0 +1,8 @@
+body {
+    text-align: right;
+    direction: rtl;
+}
+
+.icons-top-par  ul{ 
+    justify-content: left;
+}

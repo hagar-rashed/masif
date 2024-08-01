@@ -1,0 +1,71 @@
+.top-par{
+    padding: 10px 0;
+}
+.logo {
+    width: 170px;
+}
+.element ul {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 45px;
+    flex-wrap: wrap;
+}
+.element ul li a {
+    font-family: "font_medium";
+    font-size: 19px;
+    display: flex;
+    overflow-x: hidden;
+    position: relative;
+    transition: all 0.3s linear;
+    align-items: center;
+    height: 50px;
+}
+
+
+.language {
+    text-align: end;
+}
+
+.language a {
+    font-size: 20px;
+    gap: 5px ;
+    color: var(--color-text2);
+}
+
+.element ul li a::before {
+    content: "";
+    width: 90%;
+    position: absolute;
+    bottom: 0px;
+    left: 0;
+    transform: translateX(-100%);
+    height: 2px;
+    transition: all 0.3s linear;
+    opacity: 0;
+    background-color: var(--color-text2);
+}
+
+.element ul li a::after {
+    content: "";
+    width: 90%;
+    position: absolute;
+    bottom: 5px;
+    right: 0;
+    transform: translateX(100%);
+    height: 2px;
+    transition: all 0.3s linear;
+    opacity: 0;
+    background-color: var(--color-text2);
+}
+
+.element ul li a:hover::after, .element ul li a:hover::before , .element ul li a.active::before, .element ul li a.active::after  {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.element ul li a:hover ,.element ul li a.active {
+    color: var(--color-text2);
+}
+
+

@@ -1,0 +1,488 @@
+@media (max-width: 1600px) {
+  .sub-videos-index {
+    height: 645px;
+    margin: 20px 0;
+  }
+
+  .element ul li a {
+    font-size: 18px;
+  }
+
+  .sub-news-index {
+    height: 400px;
+  }
+
+  .element ul li a {
+    font-size: 17px;
+  }
+
+  .sub-jops p {
+    font-size: 18px;
+  }
+
+  .img-news {
+    height: 295px;
+  }
+
+  .text-news p {
+    margin: 11px 0;
+    font-size: 16px;
+  }
+
+  .text-sectors p {
+    line-height: 35px;
+    font-size: 18px;
+    line-height: 35px;
+    color: var(--color-main);
+  }
+
+  .text-sectors h2 {
+    font-size: 19px;
+    padding: 20px 0;
+    margin-bottom: 20px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .element ul {
+    gap: 35px;
+  }
+
+  .img-aboutus {
+    width: 100%;
+    height: 430px;
+  }
+
+
+  /* .element ul li a {
+    font-size: 16px;
+  } */
+
+}
+
+@media (max-width: 1400px) {
+  .element ul {
+    gap: 27px;
+  }
+
+  .img-jops-details object {
+    max-width: 90%;
+    width: auto;
+    height: auto;
+    max-height: 90%;
+  }
+
+  .element ul li a {
+    font-size: 16px;
+  }
+
+  .text-sectors p {
+    line-height: 35px;
+    font-size: 15px;
+    line-height: 25px;
+    color: var(--color-main);
+  }
+
+  .text-aboutus-index p {
+    font-size: 17px;
+  }
+
+  .img-more-aboutus-index img {
+    width: 80px;
+    height: 80px;
+  }
+
+  .text-sub-jops-details ul li {
+    font-size: 17px;
+  }
+
+  .element-footer ul li a {
+    font-size: 18px;
+  }
+
+  .sub-videos-index {
+    height: 590px;
+  }
+
+  .element-footer h2 {
+    font-size: 22px;
+  }
+
+  .form-footer {
+    background-color: #6fc5f027;
+    padding: 48px 10px;
+  }
+
+  .logo {
+    width: 145px;
+  }
+
+  .img-aboutus {
+    height: 464px;
+  }
+
+  .text-aboutus p {
+    line-height: 40px;
+    font-size: 18px;
+  }
+
+  .form-job-application {
+    width: 60%;
+  }
+
+  .img-last-news {
+    height: 80px;
+    width: calc(30% - 5px);
+  }
+
+  .text-last-news p {
+    font-size: 14px;
+    height: 50px;
+    line-height: 25px;
+    overflow: hidden;
+  }
+
+  .text-last-news h2 {
+    margin-bottom: 0px;
+    font-size: 17px;
+    font-family: "font_bold";
+  }
+
+  .search-new,
+  .element-news,
+  .last-news {
+    padding: 25px 20px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .element ul li a {
+    font-size: 15px;
+  }
+
+  .img-news-details {
+    height: 360px;
+  }
+
+  .video-partners {
+    margin: 30px 0 0;
+  }
+
+  .text-partners p {
+    font-size: 17px;
+    line-height: 31px;
+    margin: 30px 0 0;
+  }
+
+  .img-news {
+    height: 240px;
+  }
+
+  .element ul {
+    gap: 25px;
+  }
+
+  .sub-videos-index {
+    height: 465px;
+  }
+
+  p {
+    font-size: 15px;
+  }
+
+  .text-news-index p {
+    font-size: 17px;
+  }
+
+  .text-news-index h2 {
+    font-size: 22px;
+  }
+
+  .text-news-index a {
+    gap: 10px;
+    font-size: 17px;
+  }
+
+  .text-news-index p {
+    margin: 10px auto;
+  }
+
+  .sub-news-index {
+    height: 345px;
+  }
+
+  .end-page p {
+    font-size: 16px;
+  }
+
+  .img-aboutus {
+    height: auto;
+  }
+
+  .sub-aboutus {
+    margin: 35px 0;
+  }
+
+  .title-start1 {
+    font-size: 22px;
+  }
+
+  .text-aboutus p {
+    line-height: 31px;
+    font-size: 17px;
+  }
+
+  .sub-aboutus {
+    margin: 45px 0;
+  }
+
+  .form-job-application {
+    padding: 40px 40px;
+    width: 70%;
+  }
+
+}
+
+@media (max-width: 992px) {
+  .element {
+    display: none;
+  }
+  
+  .menu_responsive {
+    left: 0;
+    right: auto;
+    transform: translateX(-102%);
+    display: flex ;
+}
+      .logo-footer {
+        margin: auto;
+        width: 140px;
+    }
+    
+    .meida-footer ul {
+        display: flex;
+        align-items: center;
+        margin: 10px 0;
+        justify-content: center;
+        gap: 10px;
+    }
+    .end-page p {
+    font-size: 16px;
+    margin: 20px 0;
+}
+  .sub-partners.mr-section {
+    margin: 40px 0;
+  }
+
+  .sub-sectors {
+    flex-wrap: wrap;
+  }
+
+  .img-aboutus object {
+    width: 80%;
+    height: 80%;
+    height: auto !important;
+    width: auto !important;
+    margin: 25px auto;
+    max-width: 69%;
+  }
+
+
+  .img-sectors {
+    min-height: auto;
+    width: calc(100%);
+    height: 254px;
+  }
+
+  .text-sectors a {
+    font-size: 17px;
+    margin-top: 15px;
+  }
+
+  .text-sectors {
+    width: 100%;
+    padding: 0 20px 20px;
+  }
+
+  .text-sectors h2 {
+    font-size: 19px;
+    padding: 0 0 20px 0;
+    margin-bottom: 20px;
+  }
+
+  .input-form label {
+    font-size: 16px;
+  }
+
+  .title-start h2 {
+    font-size: 21px;
+    margin-bottom: 40px;
+  }
+
+  .sub-jops h2 {
+    font-size: 18px;
+  }
+
+  .sub-jops p {
+    line-height: 28px;
+    font-size: 16px;
+  }
+
+  .language {
+    position: relative;
+    display: none;
+  }
+
+  .top-par .main-container {
+    position: relative;
+  }
+
+  .menu-div {
+    position: absolute;
+    width: 50px;
+    display: block;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+  }
+
+  .form-job-application {
+    padding: 40px 40px;
+    width: 85%;
+  }
+}
+
+@media (max-width: 768px) {
+  .logo {
+    width: 101px;
+  }
+
+  .form-job-application {
+    background-color: #F6FCFE;
+    padding: 40px 15px;
+    width: 100%;
+    margin: auto;
+  }
+
+}
+
+@media (max-width: 576px) {
+  .sub-videos-index {
+    height: 245px;
+  }
+.owl-theme .owl-nav {
+    display: none !important;
+}
+  .mr-section {
+    margin: 40px 0;
+  }
+  
+
+  .form-contactus {
+    background-color: #F6FCFE;
+    padding: 16px 10px;
+  }
+
+  .text-more-aboutus-index {
+    width: 80%;
+  }
+
+  .element-footer h2 {
+    font-size: 19px;
+  }
+
+  .more-aboutus-index {
+    padding: 40px 0 0 0px;
+  }
+
+  .text-aboutus-index p {
+    font-size: 15px;
+    line-height: 30px;
+  }
+
+  .element-footer ul li a {
+    font-size: 15px;
+  }
+
+  .text-more-aboutus-index h2 {
+    font-size: 18px;
+  }
+
+
+  .sub-services-index h2 {
+    font-size: 18px;
+  }
+
+  .sub-services-index {
+
+    padding: 30px 20px;
+  }
+
+  .logo-footer {
+    margin: 0 auto 20px;
+    width: 110px;
+  }
+
+  .meida-footer ul {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px auto;
+  }
+
+  .text-aboutus-index {
+    margin: 0 auto 20px auto;
+  }
+
+  .text-sub-jops-details h2 {
+    font-size: 17px;
+    margin-bottom: 20px;
+  }
+
+  .text-sub-jops-details ul li {
+    font-size: 15px;
+  }
+
+  .img-jops-details {
+    margin: 30px 0;
+  }
+
+  .img-news-details {
+    height: 247px;
+  }
+
+  a {
+    text-decoration: none !important;
+    color: var(--color-main);
+    font-size: 14px;
+  }
+  #app .mr-section {
+    margin: 90px auto;
+    width: 100%;
+}
+}
+
+@media (max-width: 450px) {
+  .text-more-aboutus-index p {
+    line-height: 23px;
+    font-size: 14px;
+  }
+
+  .title-center h2 {
+    font-size: 18px;
+  }
+
+  .logo-partners {
+    max-width: 100px;
+  }
+
+  .title-center {
+    margin-bottom: 40px;
+  }
+
+  .sub-videos-index {
+    height: 200px;
+    margin: 0;
+  }
+}

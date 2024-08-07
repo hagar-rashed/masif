@@ -51,6 +51,7 @@
                 </a>
             </li>
         </ul>
+        {{-- unites --}}
 
         <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
             <li class="nav-item {{ areActiveRoutes(['admin.units.index', 'admin.units.create', 'admin.units.edit']) }}">
@@ -60,6 +61,7 @@
                 </a>
             </li>
         </ul>
+        {{-- trips --}}
 
         <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
             <li class="nav-item {{ areActiveRoutes(['tripIndex', 'createTrip', 'editTrip']) }}">
@@ -69,6 +71,7 @@
                 </a>
             </li>
         </ul>
+        {{-- bookings --}}
 
         <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
             <li
@@ -79,6 +82,7 @@
                 </a>
             </li>
         </ul>
+        {{-- offers --}}
 
         <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
             <li
@@ -89,6 +93,18 @@
                 </a>
             </li>
         </ul>
+        {{-- Qr codes --}}
+
+        <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
+            <li
+                class="nav-item {{ areActiveRoutes(['admin.qrcodes.index', 'admin.qrcodes.create', 'admin.qrcodes.edit']) }}">
+                <a class="d-flex align-items-center" href="{{ route('admin.qrcodes.index') }}">
+                    <i class="fa-solid fa-arrow-up-from-water-pump"></i>
+                    <span class="menu-title text-truncate">{{ __('models.qrcodes') }}</span>
+                </a>
+            </li>
+        </ul>
+
         {{-- services --}}
         {{-- <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
             <li

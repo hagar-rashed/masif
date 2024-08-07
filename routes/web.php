@@ -5,6 +5,7 @@ use App\Http\Controllers\Dashboard\BookingController;
 use App\Http\Controllers\Dashboard\OfferController;
 use App\Http\Controllers\Dashboard\TripController;
 use App\Http\Controllers\Dashboard\UnitController;
+use App\Http\Controllers\Dashboard\QRCodeController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
@@ -112,6 +113,10 @@ Route::middleware('localization')->group(function () {
 
         //Bookings
         Route::resource('booking', 'BookingController');
+        //---------------QRCode---------------------------
+        Route::resource('qrcodes', 'QRCodeController');
+        Route::delete('delete-qrcode/{id}', 'QRCodeController@destroy')->name('qrcodes.delete');
+
 
         //-------------------- Offers ---------------------------
         Route::prefix('offers')->as('offers.')->group(function () {
@@ -122,6 +127,8 @@ Route::middleware('localization')->group(function () {
             Route::patch('/update/{id}', [OfferController::class, 'update'])->name('update');
             Route::delete('/destory/{id}', [OfferController::class, 'destroy'])->name('destroy');
         });
+       
+
 
     });
 

@@ -276,4 +276,17 @@ return [
     'name_en' => 'Name In English',
     'start_date' => 'Start Date',
     'end_date' => 'End Date',
+    // ==============================QRCodes============================= //
+    'qrcodes' => 'QR CODES',
+    'qr_code' => 'QR CODE',
+    'code'     => 'CODE' ,        
+    'village_name' => 'Village_Name',
+    'starting_date' => 'Starting_Date',
+    'expiration_date' => 'Expiration_Date',
+    'code_type' => 'Code_Type',
+    'duration_days' => 'Duration (days)',
+    'guest' => 'Guest',
+    'owner' => 'Owner',
+    'rental' => 'Rental',
+    
 ];

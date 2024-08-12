@@ -8,6 +8,9 @@ use App\Http\Controllers\Api\SocialAuthController;
 use App\Http\Controllers\Api\OfferController;
 use App\Http\Controllers\Api\Dashboard\VallageController;
 use App\Http\Controllers\Api\Dashboard\ReviewController;
+use App\Http\Controllers\Api\RestaurantController;
+use App\Http\Controllers\Api\RestaurantBookingController;
+
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -117,3 +120,18 @@ Route::delete('villages/{id}', [VallageController::class, 'destroy']);
 
 Route::get('reviews', [ReviewController::class,'index']);
 Route::post('reviews', [ReviewController::class,'store']);
+
+//Restaurants 
+Route::get('restaurants', [RestaurantController::class, 'index']);
+Route::get('restaurants/{id}', [RestaurantController::class, 'show']);
+Route::post('restaurants', [RestaurantController::class, 'store']);
+Route::put('restaurants/{id}', [RestaurantController::class, 'update']);
+Route::delete('restaurants/{id}', [RestaurantController::class, 'destroy']);
+
+Route::prefix('restaurant_bookings')->group(function () {
+    Route::get('/', [RestaurantBookingController::class, 'index']); 
+    Route::post('/', [RestaurantBookingController::class, 'store']); 
+    Route::get('/{id}', [RestaurantBookingController::class, 'show']); 
+    Route::put('/{id}', [RestaurantBookingController::class, 'update']); 
+    Route::delete('/{id}', [RestaurantBookingController::class, 'destroy']); 
+});

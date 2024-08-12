@@ -105,6 +105,18 @@
             </li>
         </ul>
 
+        <!-- {{--Restaurants --}}
+
+        <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
+            <li
+                class="nav-item {{ areActiveRoutes(['admin.restaurants.index', 'admin.restaurants.create', 'admin.restaurants.edit']) }}">
+                <a class="d-flex align-items-center" href="{{ route('admin.restaurants.index') }}">
+                    <i class="fa-solid fa-arrow-up-from-water-pump"></i>
+                    <span class="menu-title text-truncate">{{ __('models.restaurants') }}</span>
+                </a>
+            </li>
+        </ul> -->
+
         {{-- services --}}
         {{-- <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
             <li

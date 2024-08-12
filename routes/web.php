@@ -6,6 +6,7 @@ use App\Http\Controllers\Dashboard\OfferController;
 use App\Http\Controllers\Dashboard\TripController;
 use App\Http\Controllers\Dashboard\UnitController;
 use App\Http\Controllers\Dashboard\QRCodeController;
+use App\Http\Controllers\Dashboard\RestaurantController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
@@ -116,6 +117,10 @@ Route::middleware('localization')->group(function () {
         //---------------QRCode---------------------------
         Route::resource('qrcodes', 'QRCodeController');
         Route::delete('delete-qrcode/{id}', 'QRCodeController@destroy')->name('qrcodes.delete');
+
+        Route::resource('restaurants', 'RestaurantController');
+        Route::delete('delete-restautant/{id}', 'RestaurantController@destroy')->name('restaurants.delete');
+
 
 
         //-------------------- Offers ---------------------------

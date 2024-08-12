@@ -288,5 +288,10 @@ return [
     'guest' => 'Guest',
     'owner' => 'Owner',
     'rental' => 'Rental',
+    // ==============================Restaurants============================= //
+    'restaurants' => 'Restaurants',
+    'add_n_restaurant'=>'Add New Restaurant'
+
+
     
 ];

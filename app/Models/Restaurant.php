@@ -12,7 +12,7 @@ class Restaurant extends Model
 protected $table = 'restaurants';
 
 protected $fillable = [
-    'name', 'location', 'lat', 'lng', 'opening_time_from', 'opening_time_to','image_url'
+    'name', 'location', 'latitude', 'longitude', 'opening_time_from', 'opening_time_to','image_url'
    
 ];
 }

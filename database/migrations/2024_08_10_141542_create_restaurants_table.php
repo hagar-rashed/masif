@@ -17,8 +17,8 @@ class CreateRestaurantsTable extends Migration
             $table->id();
             $table->string('name');
             $table->string('location');
-            $table->decimal('latitude', 10, 7)->nullable();
-            $table->decimal('longitude', 10, 7)->nullable();
+            $table->decimal('latitude')->nullable();
+            $table->decimal('longitude')->nullable();
             $table->string('opening_time_from');
             $table->string('opening_time_to');
             $table->string('image_url')->nullable();

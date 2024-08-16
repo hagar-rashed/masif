@@ -17,11 +17,17 @@ class CreateRestaurantsTable extends Migration
             $table->id();
             $table->string('name');
             $table->string('location');
-            $table->decimal('latitude')->nullable();
-            $table->decimal('longitude')->nullable();
-            $table->string('opening_time_from');
-            $table->string('opening_time_to');
-            $table->string('image_url')->nullable();
+            $table->decimal('latitude', 10, 7)->nullable(); 
+            $table->decimal('longitude', 10, 7)->nullable(); 
+            $table->string('opening_time_from'); 
+            $table->string('opening_time_to'); 
+            $table->string('image_url')->nullable(); 
+            $table->text('description')->nullable(); 
+            $table->string('phone', 15)->nullable(); 
+            $table->tinyInteger('rating')->unsigned()->default(1); 
+            $table->string('delivery_time'); 
+            $table->json('busy_rate')->nullable();  
+            $table->string('menu_qr_code')->nullable();        
             $table->timestamps();
         });
         

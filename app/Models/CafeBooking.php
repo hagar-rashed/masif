@@ -5,15 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class RestaurantBooking extends Model
+class CafeBooking extends Model
 {
     use HasFactory;
-// The table associated with the model
-protected $table = 'restaurant_bookings';
+   // The table associated with the model
+protected $table = 'cafe_bookings';
 
 // The attributes that are mass assignable
 protected $fillable = [
-    'restaurant_id',
+    'cafe_id',
     'full_name',
     'mobile_number',
     'appointment_time',
@@ -22,9 +22,9 @@ protected $fillable = [
     'qr_code_path',
 ];
 
-   // Relationship with Restaurant
-   public function restaurant()
+   // Relationship with cafe
+   public function cafe()
    {
-       return $this->belongsTo(Restaurant::class);
-   }
+       return $this->belongsTo(Cafe::class);
+   }  
 }

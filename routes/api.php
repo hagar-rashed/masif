@@ -9,7 +9,10 @@ use App\Http\Controllers\Api\OfferController;
 use App\Http\Controllers\Api\Dashboard\VallageController;
 use App\Http\Controllers\Api\Dashboard\ReviewController;
 use App\Http\Controllers\Api\RestaurantController;
-use App\Http\Controllers\Api\RestaurantBookingController;
+use App\Http\Controllers\Api\RestaurantBookingController;//update (13/8/2024 amira)
+use App\Http\Controllers\Api\CafeController;//update (13/8/2024 amira)
+use App\Http\Controllers\Api\CafeBookingController;//update (13/8/2024 amira)
+use App\Http\Controllers\Api\MenuItemController;
 
 
 use Illuminate\Http\Request;
@@ -84,29 +87,17 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/offers', [OfferController::class, 'showOffers']);
 });
 
-
-
-
-
-
-
 // services Route dashboard
 Route::get('services', [ServiceController::class, 'index']);
-
 Route::post('services', [ServiceController::class, 'store']);
-
 Route::get('services/{id}', [ServiceController::class, 'show']);
-
 Route::put('services/{id}', [ServiceController::class, 'update']);
-
 Route::delete('services/{id}', [ServiceController::class, 'destroy']);
 
 
 // services Route site
 Route::get('site/services/{village_id}', [SiteServiceController::class, 'getByVillage']);
-
 Route::get('site/services/{id}', [SiteServiceController::class, 'show']);
-
 Route::get('site/services', [SiteServiceController::class, 'index']);
 
 // services villages site
@@ -121,17 +112,30 @@ Route::delete('villages/{id}', [VallageController::class, 'destroy']);
 Route::get('reviews', [ReviewController::class,'index']);
 Route::post('reviews', [ReviewController::class,'store']);
 
-//Restaurants 
+//Cafes update (13/8/2024 amira)
+Route::get('cafes', [CafeController::class, 'index']);
+Route::get('cafes/{id}', [CafeController::class, 'show']);
+Route::post('cafes', [CafeController::class, 'store']);
+Route::put('cafes/{id}', [CafeController::class, 'update']);
+Route::delete('cafes/{id}', [CafeController::class, 'destroy']);   
+Route::post('cafes/{cafeId}/bookings', [CafeBookingController::class, 'store']); 
+
+
+//Restaurants update (13/8/2024 amira)
 Route::get('restaurants', [RestaurantController::class, 'index']);
 Route::get('restaurants/{id}', [RestaurantController::class, 'show']);
 Route::post('restaurants', [RestaurantController::class, 'store']);
 Route::put('restaurants/{id}', [RestaurantController::class, 'update']);
 Route::delete('restaurants/{id}', [RestaurantController::class, 'destroy']);
+Route::post('restaurants/{restaurantId}/bookings', [RestaurantBookingController::class, 'store']);
 
-Route::prefix('restaurant_bookings')->group(function () {
-    Route::get('/', [RestaurantBookingController::class, 'index']); 
-    Route::post('/', [RestaurantBookingController::class, 'store']); 
-    Route::get('/{id}', [RestaurantBookingController::class, 'show']); 
-    Route::put('/{id}', [RestaurantBookingController::class, 'update']); 
-    Route::delete('/{id}', [RestaurantBookingController::class, 'destroy']); 
-});
+//new (15/8/2024 amira)
+Route::get('restaurants/{id}/generate-qr', [RestaurantController::class, 'generateQrCodeForRestaurant']);
+Route::get('restaurants/{id}/menu-items-image', [RestaurantController::class, 'getMenuItemsWithImage']);
+
+
+//new (15/8/2024 amira)
+Route::post('menu-items', [MenuItemController::class, 'store']);
+Route::put('menu-items/{id}', [MenuItemController::class, 'update']);
+Route::delete('menu-items/{id}', [MenuItemController::class, 'destroy']);
+Route::post('cart/add', [MenuItemController::class, 'addToCart']);

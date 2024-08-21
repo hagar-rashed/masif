@@ -16,7 +16,7 @@ class CafeBookingController extends Controller
     public function store(Request $request, $cafeId)
     {
         // Find the cafe by ID
-       $cafe = Cafe::find($cafeId);
+        $cafe = Cafe::find($cafeId);
     
         if (!$cafe) {
             return response()->json(['message' => 'Cafe not found'], 404);
@@ -24,16 +24,15 @@ class CafeBookingController extends Controller
     
         // Validate the incoming request data
         $validatedData = $request->validate([
-           
             'full_name' => 'required|string|max:255',
             'mobile_number' => 'required|string|max:20',
             'appointment_time' => 'required|date_format:Y-m-d H:i:s',
             'number_of_individuals' => 'required|in:1-3,4-6,6-8',
-            'payment_method' => 'required|in:cash_on_cafe,wallet,credit/debit/ATM',
+            'payment_method' => 'required|in:cash,wallet,credit/debit/ATM',
         ]);
     
         // Create the booking record
-        $booking = CafeBooking::create(array_merge($validatedData, ['cafe_id' =>$cafe->id]));
+        $booking = CafeBooking::create(array_merge($validatedData, ['cafe_id' => $cafe->id]));
     
         // Generate the QR code data as a string
         $qrData = json_encode([
@@ -42,8 +41,8 @@ class CafeBookingController extends Controller
             'appointment_time' => $booking->appointment_time,
             'number_of_individuals' => $booking->number_of_individuals,
             'payment_method' => $booking->payment_method,
-            'cafe_name' =>$cafe->name,
-            'cafe_location' =>$cafe->location,
+            'cafe_name' => $cafe->name,
+            'cafe_location' => $cafe->location,
         ]);
     
         // Generate the QR code image
@@ -64,3 +63,4 @@ class CafeBookingController extends Controller
         ], 201);
     }
 }    
+    

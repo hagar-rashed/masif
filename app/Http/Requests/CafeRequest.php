@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class RestaurantRequest extends FormRequest
+class CafeRequest extends FormRequest
 {
     public function authorize()
     {
@@ -18,7 +18,7 @@ class RestaurantRequest extends FormRequest
             'location' => 'required|string|max:255',
             'opening_time_from' => 'required',
             'opening_time_to' => 'required',           
-           'image_url' => 'nullable|image', 
+           'image_url' => 'nullable|url|ends_with:jpg,jpeg,png',
            'latitude' => 'required|numeric',
            'longitude' => 'required|numeric',
            'description' => 'nullable|string',

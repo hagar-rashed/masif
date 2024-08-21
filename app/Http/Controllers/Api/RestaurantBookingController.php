@@ -46,22 +46,29 @@ class RestaurantBookingController extends Controller
             'restaurant_location' => $restaurant->location,
         ]);
     
-        // Generate the QR code image
-        $qrCode = QrCode::format('png')->size(300)->generate($qrData);
+         // Generate the QR code image
+         $qrCode = QrCode::format('png')->size(300)->generate($qrData);
     
-        // Define the path to store the QR code image
-        $qrCodePath = 'qrcodes/' . uniqid() . '.png';
-    
-        // Store the QR code image on disk
-        Storage::disk('public')->put($qrCodePath, $qrCode);
-    
-        // Save the QR code path to the booking record
-        $booking->update(['qr_code_path' => $qrCodePath]);
-    
-        return response()->json([
-            'message' => 'Booking created successfully',
-            'booking' => $booking
-        ], 201);
-    }
-}    
-    
+         // Generate a file name starting with "restaurant" and a unique identifier
+         $qrCodeFileName = 'restaurant_' . uniqid() . '.png';
+     
+         // Define the path to store the QR code image in 'public/storage/bookings' folder
+         $qrCodePath = 'bookings/' . $qrCodeFileName;
+     
+         // Store the QR code image in the public storage path
+         Storage::disk('public')->put($qrCodePath, $qrCode);
+     
+         // Save the QR code path to the booking record
+         $booking->update(['qr_code_path' => $qrCodePath]);
+     
+         // Construct the full URL for the QR code
+         $qrCodeUrl = url('storage/' . $qrCodePath);
+     
+         return response()->json([
+             'message' => 'Booking created successfully',
+             'booking' => $booking,
+             'qr_code_url' => $qrCodeUrl
+         ], 201);
+     }
+ }
+ 

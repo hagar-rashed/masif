@@ -20,7 +20,7 @@ class CreateCafeBookingsTable extends Migration
             $table->string('mobile_number');
             $table->timestamp('appointment_time');
             $table->enum('number_of_individuals', ['1-3', '4-6', '6-8']);
-            $table->enum('payment_method', ['cash_on_cafe', 'wallet', 'credit/debit/ATM']);
+            $table->enum('payment_method', ['cash', 'wallet', 'credit/debit/ATM']);
             $table->string('qr_code_path')->nullable();
             $table->timestamps();
         });

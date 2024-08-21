@@ -4,18 +4,18 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateMenuItemsTable extends Migration
+class CreateCafeItemsTable extends Migration
 {
     /**
      * Run the migrations.
      *
-     * @return void
+      * @return void
      */
     public function up()
     {
-        Schema::create('menu_items', function (Blueprint $table) {
+        Schema::create('cafe_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('restaurant_id')->constrained()->onDelete('cascade');           
+            $table->foreignId('cafe_id')->constrained()->onDelete('cascade');           
             $table->string('name');
             $table->text('description');
             $table->decimal('price_before_discount', 8, 2);
@@ -36,6 +36,6 @@ class CreateMenuItemsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('menu_items');
+        Schema::dropIfExists('cafe_items');
     }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\MenuItem;
 use App\Models\Restaurant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class MenuItemController extends Controller
 {
@@ -19,68 +20,97 @@ class MenuItemController extends Controller
     // Show a specific menu item
     public function show($id)
     {
-        $menuItem = MenuItem::findOrFail($id);
-        return response()->json($menuItem);
+        $menuItem = MenuItem::findOrFail($id);  
+        return response()->json($menuItem); 
+
+  
     }
 
-    // Create a new menu item
+
     public function store(Request $request)
     {
+        // Validate the incoming request data
         $validatedData = $request->validate([
-            'restaurant_id' => 'required|exists:restaurants,id', 
+            'restaurant_id' => 'required|exists:restaurants,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price_before_discount' => 'required|numeric',
             'price_after_discount' => 'required|numeric',
             'calories' => 'required|in:150 kal,200 kal,300 kal',
-            'image' => 'nullable|string',
+            'image' => 'nullable|image', // validate as an image
             'rating' => 'required|numeric|min:0|max:5',
             'purchase_rate' => 'required|numeric|min:0|max:5',
             'preparation_time' => 'required',
-        ]); 
+        ]);
+    
+        // Get the restaurant name
+        $restaurant = Restaurant::find($validatedData['restaurant_id']);
+        $restaurantName = $restaurant->name;
+     // Check if an image was uploaded
+     if ($request->hasFile('image')) {
+        // Store the new image
+        $imagePath = $request->file('image')->store('menu_images', 'public');
+        $validatedData['image'] = $imagePath;
+    }
 
-        $menuItem = MenuItem::create($validatedData);        
+    // Create a new menu item with validated data
+    $menuItem = MenuItem::create($validatedData);
 
+    // Optionally, return the image URL
+    if (isset($validatedData['image'])) {
+        $menuItem->image = asset('storage/' . $validatedData['image']); }
+          
+        // Return the created menu item with the image filename as a JSON response
         return response()->json($menuItem, 201);
     }
+    
 
-   
-  
+
     public function update(Request $request, $id)
-{
-    // Find the menu item by ID or return null if not found
-    $menuItem = MenuItem::find($id);
+    {
+        // Find the menu item by ID
+        $menuItem = MenuItem::findOrFail($id);
+    
+        // Validate the incoming request data
+        $validatedData = $request->validate([
+            'restaurant_id' => 'required|exists:restaurants,id',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price_before_discount' => 'required|numeric',
+            'price_after_discount' => 'required|numeric',
+            'calories' => 'required|in:150 kal,200 kal,300 kal',
+            'image' => 'nullable|image', // validate as an image
+            'rating' => 'required|numeric|min:0|max:5',
+            'purchase_rate' => 'required|numeric|min:0|max:5',
+            'preparation_time' => 'required',
+        ]);
+    
+        // Check if an image was uploaded
+        if ($request->hasFile('image')) {
+            // Delete the old image from storage if it exists
+            if ($menuItem->image && Storage::disk('public')->exists($menuItem->image)) {
+                Storage::disk('public')->delete($menuItem->image);
+            }
+    
+            // Store the new image
+            $imagePath = $request->file('image')->store('menu_images', 'public');
+            $validatedData['image'] = $imagePath;
+        }
+    
+        // Update the menu item with validated data
+        $menuItem->update($validatedData);
 
-    // Check if the menu item was found
-    if (!$menuItem) {
-        return response()->json(['error' => 'Menu item not found'], 404);
+        
+    // Optionally, return the image URL
+        if (isset($validatedData['image'])) {
+        $menuItem->image = asset('storage/' . $validatedData['image']); 
     }
-
-    // Validate request data
-    $validatedData = $request->validate([
-        'name' => 'sometimes|required|string|max:255',
-        'description' => 'nullable|string',
-        'price_before_discount' => 'sometimes|required|numeric',
-        'price_after_discount' => 'sometimes|required|numeric',
-        'calories' => 'sometimes|required|in:150 kal,200 kal,300 kal',
-        'image' => 'nullable|string',
-        'rating' => 'sometimes|required|numeric|min:0|max:5',
-        'purchase_rate' => 'sometimes|required|numeric|min:0|max:5',
-        'preparation_time' => 'sometimes|required|integer',
-    ]);
-
-    // Update the menu item with validated data
-    $menuItem->update($validatedData);
-
-    // Return the updated menu item
-  //  return response()->json($menuItem, 200);
-  return response()->json([
-    'message' => 'Menu item updated successfully',
-    'menuItem' => $menuItem
-  ], 200);
-}
-
-
+          
+    
+        // Return a JSON response with the updated menu item
+        return response()->json($menuItem, 200);
+    }
+    
    
     public function destroy($id)
     {

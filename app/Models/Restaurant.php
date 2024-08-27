@@ -21,10 +21,11 @@ protected $casts = [
     'busy_rate' => 'array', 
 ];
 
-public function menuItems()
-{
-        return $this->hasMany(MenuItem::class);
-}
+public function categories()
+    {
+        return $this->hasMany(RestaurantCategory::class);
+       
+    }
 
 }
 

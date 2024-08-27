@@ -18,7 +18,7 @@ class CafeRequest extends FormRequest
             'location' => 'required|string|max:255',
             'opening_time_from' => 'required',
             'opening_time_to' => 'required',           
-           'image_url' => 'nullable|url|ends_with:jpg,jpeg,png',
+           'image_url' => 'nullable|image', 
            'latitude' => 'required|numeric',
            'longitude' => 'required|numeric',
            'description' => 'nullable|string',
@@ -29,6 +29,7 @@ class CafeRequest extends FormRequest
            'busy_rate.*.time_from' => 'required_with:busy_rate|string',
            'busy_rate.*.time_to' => 'required_with:busy_rate|string',
            'busy_rate.*.percentage' => 'required_with:busy_rate|integer|min:0|max:100',
+           
            
         ];
     }

@@ -11,17 +11,17 @@ use App\Http\Controllers\Api\Dashboard\ReviewController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-//////////////////////amira///////////////////////////////////////////
+//////////////////////      Amira Gaber     ////////////////////////////////////////////////////////////////
 use App\Http\Controllers\Api\RestaurantController;
 use App\Http\Controllers\Api\RestaurantBookingController;
 use App\Http\Controllers\Api\MenuItemController;
-///////////////////////////////////////////////////////////////////////
-
+use App\Http\Controllers\Api\RestaurantCategoryController;
 use App\Http\Controllers\Api\CafeController;
+use App\Http\Controllers\Api\CafeCategoryController;
 use App\Http\Controllers\Api\CafeBookingController;
 use App\Http\Controllers\Api\CafeItemController;
-
-//////////////////////////////////////////////////////////////////////////
+use App\Http\Controllers\Api\CinemaController;
+use App\Http\Controllers\Api\MovieController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -117,35 +117,74 @@ Route::get('reviews', [ReviewController::class,'index']);
 Route::post('reviews', [ReviewController::class,'store']);
 
 
-//Restaurants update (amira)//////////////////////////////////////////////////////////////////////////
-Route::get('restaurants', [RestaurantController::class, 'index']);
-Route::get('restaurants/{id}', [RestaurantController::class, 'show']);
-Route::post('restaurants', [RestaurantController::class, 'store']);
-Route::post('restaurants/{id}', [RestaurantController::class, 'update']);
-Route::delete('restaurants/{id}', [RestaurantController::class, 'destroy']);
-Route::post('restaurants/{restaurantId}/bookings', [RestaurantBookingController::class, 'store']);
+////////////////////////////////  Amira Gaber   //////////////////////////////////////////////////////////////////////////
+Route::prefix('restaurants')->group(function(){
+    Route::get('/', [RestaurantController::class, 'index']);
+    Route::get('{id}', [RestaurantController::class, 'show']);
+    Route::post('/', [RestaurantController::class, 'store']);
+    Route::post('{id}', [RestaurantController::class, 'update']);
+    Route::delete('{id}', [RestaurantController::class, 'destroy']);   
+    Route::get('{id}/generate-qr', [RestaurantController::class, 'generateQrCodeForRestaurant']);
+    Route::post('{restaurantId}/bookings', [RestaurantBookingController::class, 'store']);
+    Route::get('{id}/categories', [RestaurantCategoryController::class, 'index']);
+    Route::post('{id}/categories', [RestaurantCategoryController::class, 'store']);    
+    Route::post('{restaurant_id}/categories/{category_id}', [RestaurantCategoryController::class, 'update']);
 
-Route::get('restaurants/{id}/generate-qr', [RestaurantController::class, 'generateQrCodeForRestaurant']);
-Route::get('restaurants/{id}/menu-items-image', [RestaurantController::class, 'getMenuItemsWithImage']);
+});
+Route::get('restaurant-categories/{id}', [RestaurantCategoryController::class, 'show']);
+Route::delete('restaurant-categories/{id}', [RestaurantCategoryController::class, 'destroy']);
 
-Route::post('menu-items', [MenuItemController::class, 'store']);
-Route::post('menu-items/{id}', [MenuItemController::class, 'update']);
-Route::delete('menu-items/{id}', [MenuItemController::class, 'destroy']);
-Route::post('cart/add', [MenuItemController::class, 'addToCart']);
+Route::prefix('menu-items')->group(function(){    
+    Route::get('category/{category_id}', [MenuItemController::class, 'index']);
+    Route::get('{id}', [MenuItemController::class, 'show']);   
+    Route::post('category/{category_id}', [MenuItemController::class, 'store']);
+    Route::post('category/{category_id}/{id}', [MenuItemController::class, 'update']);  
+    Route::delete('{id}', [MenuItemController::class, 'destroy']);
+    Route::post('cart/add', [MenuItemController::class, 'addToCart']);
+});
 
-//////////////////////////new////////////////////////////////////////////////////////////////////////////////////////
+Route::prefix('cafes')->group(function(){
+    Route::get('/', [CafeController::class, 'index']);
+    Route::get('{id}', [CafeController::class, 'show']);
+    Route::post('/', [CafeController::class, 'store']);
+    Route::post('{id}', [CafeController::class, 'update']);
+    Route::delete('{id}', [CafeController::class, 'destroy']);     
+    Route::get('{id}/generate-qr', [CafeController::class, 'generateQrCodeForCafe']);
+    Route::post('{cafeId}/bookings', [CafeBookingController::class, 'store']); 
 
-Route::get('cafes', [CafeController::class, 'index']);
-Route::get('cafes/{id}', [CafeController::class, 'show']);
-Route::post('cafes', [CafeController::class, 'store']);
-Route::put('cafes/{id}', [CafeController::class, 'update']);
-Route::delete('cafes/{id}', [CafeController::class, 'destroy']);   
-Route::post('cafes/{cafeId}/bookings', [CafeBookingController::class, 'store']); 
+    Route::get('{id}/categories', [CafeCategoryController::class, 'index']);
+    Route::post('{cafe_id}/categories', [CafeCategoryController::class, 'store']);
+    Route::post('{cafe_id}/categories/{category_id}', [CafeCategoryController::class, 'update']);
+});
+
+Route::get('cafe-categories/{id}', [CafeCategoryController::class, 'show']);
+Route::delete('cafe-categories/{id}', [CafeCategoryController::class, 'destroy']);
+
+Route::prefix('cafe-items')->group(function(){
+    Route::get('category/{category_id}', [CafeItemController::class, 'index']);
+    Route::get('{id}', [CafeItemController::class, 'show']);
+    Route::post('category/{category_id}', [CafeItemController::class, 'store']);    
+    Route::post('category/{category_id}/{id}', [CafeItemController::class, 'update']);
+    Route::delete('{id}', [CafeItemController::class, 'destroy']);
+    Route::post('cart/add', [CafeItemController::class, 'addToCart']);
+});
+
+Route::prefix('cinemas')->group(function(){
+    Route::get('/', [CinemaController::class, 'index']);
+    Route::get('{id}', [CinemaController::class, 'show']);
+    Route::post('/', [CinemaController::class, 'store']);
+    Route::post('{id}', [CinemaController::class, 'update']);
+    Route::delete('{id}', [CinemaController::class, 'destroy']);
+    Route::get('{id}/movies', [CinemaController::class, 'showMovies']);
+});
+
+Route::prefix('movies')->group(function(){
+    Route::get('/', [MovieController::class, 'index']);
+    Route::get('{id}', [MovieController::class, 'show']);
+    Route::post('/', [MovieController::class, 'store']);    
+    Route::post('{id}', [MovieController::class, 'update']);
+    Route::delete('{id}', [MovieController::class, 'destroy']);
+});
 
 
-Route::get('cafes/{id}/generate-qr', [CafeController::class, 'generateQrCodeForCafe']);
-Route::get('cafes/{id}/cafe-items-image', [CafeController::class, 'getCafeItemsWithImage']);
 
-Route::post('cafe-items', [CafeItemController::class, 'store']);
-Route::put('cafe-items/{id}', [CafeItemController::class, 'update']);
-Route::delete('cafe-items/{id}', [CafeItemController::class, 'destroy']);

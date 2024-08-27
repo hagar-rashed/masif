@@ -16,251 +16,199 @@ use Illuminate\Support\Facades\File;
 
 class RestaurantController extends Controller
 {
-   // List all restaurants with their menu items
-   public function index()
-   {
+   
+    public function index()
+{
+    try {
+        $restaurants = Restaurant::with(['categories'])->get();
     
-    // Fetch all restaurants with their menu items
-    $restaurants = Restaurant::with('menuItems')->get();
-
-    // Map over each restaurant and its menu items to add the full image URL
-    $restaurants = $restaurants->map(function ($restaurant) {
-        $restaurant->menuItems = $restaurant->menuItems->map(function ($menuItem) {
-            // Construct the full image URL
-            $menuItem->image = $menuItem->image ? asset('storage/' . $menuItem->image) : null;
-            return $menuItem;
+        $restaurants->each(function ($restaurant) {
+            $restaurant->image_url = $restaurant->image_url ? asset('storage/' . $restaurant->image_url) : null;
         });
-        return $restaurant;
-    });
+    
+        return response()->json($restaurants);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'An unexpected error occurred while retrieving restaurants. Please try again later.'], 500);
+    }
+}
+    
 
-    // Return the response as JSON
-    return response()->json($restaurants);
-   }
-
-   
-   // Show a specific restaurant with its menu items
-   public function show($id)
-   {
-       // Fetch the specific restaurant with its menu items
-       $restaurant = Restaurant::with('menuItems')->find($id);
-   
-       // Check if the restaurant exists
-       if (!$restaurant) {
-           return response()->json(['message' => 'Restaurant not found'], 404);
-       }
-   
-       // Map over the menu items to include the full image URL
-       $restaurant->menuItems = $restaurant->menuItems->map(function ($menuItem) {
-           // Construct the full image URL
-           $menuItem->image = $menuItem->image ? asset('storage/' . $menuItem->image) : null;
-           return $menuItem;
-       });
-   
-       // Return the response as JSON
-       return response()->json($restaurant);
-   }
-   
+public function show($id)
+{
+    try {
+        $restaurant = Restaurant::with(['categories'])->findOrFail($id);
+        // Add the full image URL to the restaurant object
+        $restaurant->image_url = $restaurant->image_url ? asset('storage/' . $restaurant->image_url) : null;
+          
+       
+        return response()->json($restaurant, 200);
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        return response()->json(['error' => 'Restaurant not found.'], 404);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'An unexpected error occurred while retrieving the restaurant. Please try again later.'], 500);
+    }
+}
 
 
-   public function store(RestaurantRequest $request)
-   {
-       // Validate the incoming request data
-       $data = $request->validated();
-       $validatedData = $data; // Initialize validatedData
-   
-       // Handle image upload if present
-       if ($request->hasFile('image_url')) {
-           $imagePath = $request->file('image_url')->store('restaurants', 'public');
-           $validatedData['image_url'] = $imagePath;
-       }
-   
-       // Create the restaurant with validated data
-       $restaurant = Restaurant::create($validatedData);
-   
-       // Optionally, return the image URL
-       if (isset($validatedData['image_url'])) {
-           $restaurant->image_url = asset('storage/' . $validatedData['image_url']);
-       }
-   
-       return response()->json($restaurant, 201);
-   }
-   
+public function store(RestaurantRequest $request)
+{
+    try {
+        $data = $request->validated();
+        $validatedData = $data; // Initialize validatedData
+
+        if ($request->hasFile('image_url')) {
+            $imagePath = $request->file('image_url')->store('restaurants', 'public');
+            $validatedData['image_url'] = $imagePath;
+        }
+
+        $restaurant = Restaurant::create($validatedData);
+
+        if (isset($validatedData['image_url'])) {
+            $restaurant->image_url = asset('storage/' . $validatedData['image_url']);
+        }
+
+        return response()->json($restaurant, 201);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json(['error' => $e->errors()], 422);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'An unexpected error occurred while creating the restaurant. Please try again later.'], 500);
+    }
+}
 
 
    
 public function update(RestaurantRequest $request, $id)
 {
-    // Validate the incoming request data
-    $data = $request->validated();
+    try {
+        $data = $request->validated();
 
-    // Find the restaurant by ID
-    $restaurant = Restaurant::findOrFail($id);
+        $restaurant = Restaurant::findOrFail($id);
 
-    // Check if a new image file is provided
-    if ($request->hasFile('image_url')) {
-        // Extract the image path from the existing URL
-        $oldImagePath = str_replace(asset('storage/'), '', $restaurant->image_url);
+        if ($request->hasFile('image_url')) {
+            $oldImagePath = str_replace(asset('storage/'), '', $restaurant->image_url);
 
-        // Delete the old image if it exists in the storage
-        if (Storage::disk('public')->exists($oldImagePath)) {
-            Storage::disk('public')->delete($oldImagePath);
+            if (Storage::disk('public')->exists($oldImagePath)) {
+                Storage::disk('public')->delete($oldImagePath);
+            }
+
+            $newImagePath = $request->file('image_url')->store('restaurants', 'public');
+            $data['image_url'] = $newImagePath;
         }
 
-        // Store the new image and update the image URL in the data array
-        $newImagePath = $request->file('image_url')->store('restaurants', 'public');
-        $data['image_url'] = $newImagePath;
+        $restaurant->update($data);
+
+       // Generate the full URL for the image to return in the response
+       if (isset($data['image_url'])) {
+        $restaurant->image_url = asset('storage/' . $data['image_url']);
     }
-
-    // Update the restaurant with the new data
-    $restaurant->update($data);
-
-    // Update the image URL with the public path
-    $restaurant->image_url = asset('storage/' . $restaurant->image_url);
-    $restaurant->save();
-
-    return response()->json($restaurant, 200);
+        return response()->json($restaurant, 200);
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        return response()->json(['error' => 'Restaurant not found.'], 404);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json(['error' => $e->errors()], 422);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'An unexpected error occurred while updating the restaurant. Please try again later.'], 500);
+    }
 }
 
 
-   public function generateQrCodeForRestaurant($id)
-   {
-       // Fetch the restaurant with its menu items
-       $restaurant = Restaurant::with('menuItems')->find($id);
-   
-       // If the restaurant is not found, return a 404 error response
-       if (!$restaurant) {
-           return response()->json(['error' => 'Restaurant not found'], 404);
-       }
-   
-       // Prepare data for the QR code
-       $qrCodeData = [
-           'restaurant_name' => $restaurant->name,
-           'location' => $restaurant->location,
-           'latitude' => $restaurant->latitude,
-           'longitude' => $restaurant->longitude,
-           'opening_time_from' => $restaurant->opening_time_from,
-           'opening_time_to' => $restaurant->opening_time_to,
-           'menu_items' => $restaurant->menuItems->map(function($item) {
-               return [
-                   'name' => $item->name,
-                   'description' => $item->description,
-                   'price' => $item->price,
-                   'calories' => $item->calories,
-                   'rating' => $item->rating,
-                   'purchase_rate' => $item->purchase_rate,
-                   'preparation_time' => $item->preparation_time,
-               ];
-           })->toArray()
-       ];
-   
-       // Convert the data to JSON format
-       $jsonQrData = json_encode($qrCodeData);
-   
-       // Ensure the directory exists
-       $qrCodeDir = public_path('storage/qr_codes/');
-       if (!File::exists($qrCodeDir)) {
-           File::makeDirectory($qrCodeDir, 0755, true);
-       }
-   
-       // Generate the QR code and save it to a file
-       $qrCodePath = 'qr_codes/restaurant_' . $restaurant->id . '.png';
-       QrCode::format('png')
-           ->size(300)
-           ->generate($jsonQrData, $qrCodeDir . 'restaurant_' . $restaurant->id . '.png');
-   
-       // Save the QR code path in the restaurant record (optional)
-       $restaurant->menu_qr_code = $qrCodePath;
-       $restaurant->save();
-   
-       // Return the QR code URL in the response
-       return response()->json([
-           'message' => 'QR code generated successfully',
-           'qr_code_url' => asset('storage/' . $qrCodePath),
-       ]);
-   }
-
-public function getMenuItemsWithImage($id)
+public function generateQrCodeForRestaurant($id)
 {
-    // Fetch the restaurant with its menu items
-    $restaurant = Restaurant::with('menuItems')->find($id);
+    try {
+        $restaurant = Restaurant::with('categories.items')->findOrFail($id);
 
-    if (!$restaurant) {
-        return response()->json(['message' => 'Restaurant not found'], 404);
-    }
-
-    // Prepare the data for response
-    $menuItems = $restaurant->menuItems->map(function ($item) {
-        return [
-            'name' => $item->name,
-            'image' => $item->image ?  asset('storage/' . $item->image) : null,    // The full URL is already stored
+        $qrCodeData = [
+            'restaurant_name' => $restaurant->name,
+            'location' => $restaurant->location,
+            'latitude' => $restaurant->latitude,
+            'longitude' => $restaurant->longitude,
+            'opening_time_from' => $restaurant->opening_time_from,
+            'opening_time_to' => $restaurant->opening_time_to,
+            'categories' => $restaurant->categories->map(function ($category) {
+                return [
+                    'name' => $category->name,
+                    'items' => $category->items->map(function ($item) {
+                        return [
+                            'name' => $item->name,
+                            'description' => $item->description,
+                            'price_before_discount' => $item->price_before_discount,
+                            'price_after_discount' => $item->price_after_discount,
+                            'calories' => $item->calories,
+                            'rating' => $item->rating,
+                            'purchase_rate' => $item->purchase_rate,
+                            'preparation_time' => $item->preparation_time,
+                        ];
+                    })->toArray()
+                ];
+            })->toArray()
         ];
-    });
 
-    return response()->json([
-        'restaurant' => $restaurant->name,
-        'menu_items' => $menuItems,
-    ]);
+        $jsonQrData = json_encode($qrCodeData);
+
+        $qrCodeDir = public_path('storage/qr_codes/');
+        if (!File::exists($qrCodeDir)) {
+            File::makeDirectory($qrCodeDir, 0755, true);
+        }
+
+        $qrCodePath = 'qr_codes/restaurant_' . $restaurant->id . '.png';
+        QrCode::format('png')
+            ->size(300)
+            ->generate($jsonQrData, $qrCodeDir . 'restaurant_' . $restaurant->id . '.png');
+
+        $restaurant->menu_qr_code = $qrCodePath;
+        $restaurant->save();
+
+        return response()->json([
+            'message' => 'QR code generated successfully',
+            'qr_code_url' => asset('storage/' . $qrCodePath),
+        ]);
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        return response()->json(['error' => 'Restaurant not found.'], 404);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'An unexpected error occurred while generating the QR code. Please try again later.'], 500);
+    }
 }
 
 public function destroy($id)
 {
-    // Find the restaurant by ID
-    $restaurant = Restaurant::find($id);
+    try {
+        $restaurant = Restaurant::findOrFail($id);
 
-    if (!$restaurant) {
+        if ($restaurant->image_url) {
+            $imagePath = str_replace(asset('storage/'), '', $restaurant->image_url);
+
+            if (Storage::disk('public')->exists($imagePath)) {
+                Storage::disk('public')->delete($imagePath);
+            }
+        }
+
+        if ($restaurant->menu_qr_code) {
+            $qrCodePath = str_replace(asset('storage/'), '', $restaurant->menu_qr_code);
+
+            if (Storage::disk('public')->exists($qrCodePath)) {
+                Storage::disk('public')->delete($qrCodePath);
+            }
+        }
+
+        $bookings = RestaurantBooking::where('restaurant_id', $id)->get();
+        foreach ($bookings as $booking) {
+            if ($booking->qr_code_path) {
+                $bookingQrCodePath = str_replace(asset('storage/'), '', $booking->qr_code_path);
+
+                if (Storage::disk('public')->exists($bookingQrCodePath)) {
+                    Storage::disk('public')->delete($bookingQrCodePath);
+                }
+            }
+        }
+
+        $restaurant->delete();
+
+        return response()->json(['message' => 'Restaurant and associated data deleted successfully.'], 200);
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
         return response()->json(['error' => 'Restaurant not found.'], 404);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'An unexpected error occurred while deleting the restaurant. Please try again later.'], 500);
     }
-
-    // Delete the restaurant's image if it exists
-    if ($restaurant->image_url) {
-        $imagePath = str_replace(asset('storage/'), '', $restaurant->image_url);
-
-        // Delete the image file from storage
-        if (Storage::disk('public')->exists($imagePath)) {
-            Storage::disk('public')->delete($imagePath);
-        }
-    }
-
-    // Delete the restaurant's QR code if it exists
-    if ($restaurant->menu_qr_code) {
-        $qrCodePath = str_replace(asset('storage/'), '', $restaurant->menu_qr_code);
-
-        // Delete the QR code file from storage
-        if (Storage::disk('public')->exists($qrCodePath)) {
-            Storage::disk('public')->delete($qrCodePath);
-        }
-    }
-
-    // Find and delete related booking QR codes
-    $bookings = RestaurantBooking::where('restaurant_id', $id)->get();
-    foreach ($bookings as $booking) {
-        if ($booking->qr_code_path) {
-            $bookingQrCodePath = str_replace(asset('storage/'), '', $booking->qr_code_path);
-
-            // Delete the booking QR code file from storage
-            if (Storage::disk('public')->exists($bookingQrCodePath)) {
-                Storage::disk('public')->delete($bookingQrCodePath);
-            }
-        }
-    }
-
-    // Find and delete related menu item images
-    $menuItems = $restaurant->menuItems; // Load related menu items
-    foreach ($menuItems as $menuItem) {
-        if ($menuItem->image) {
-            $menuItemImagePath = str_replace(asset('storage/'), '', $menuItem->image);
-
-            // Delete the menu item image file from storage
-            if (Storage::disk('public')->exists($menuItemImagePath)) {
-                Storage::disk('public')->delete($menuItemImagePath);
-            }
-        }
-    }
-
-    // Delete the restaurant record
-    $restaurant->delete();
-
-    return response()->json(['message' => 'Restaurant and associated data deleted successfully.'], 200);
 }
 
 

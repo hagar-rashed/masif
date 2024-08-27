@@ -17,8 +17,9 @@ class Cafe extends Model
         'busy_rate' => 'array', 
     ];
     
-    public function cafeItems()
+    public function categories()
     {
-            return $this->hasMany(CafeItem::class);
+        return $this->hasMany(CafeCategory::class);
+       
     }
 }

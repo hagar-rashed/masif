@@ -10,13 +10,16 @@ class MenuItem extends Model
     use HasFactory;
 
     protected $fillable = [
-        'restaurant_id','name', 'description', 'price_before_discount','price_after_discount', 'calories', 'image', 'rating', 'purchase_rate', 'preparation_time'
+        'category_id','name', 'description', 'price_before_discount','price_after_discount', 'calories', 'image', 'rating', 'purchase_rate', 'preparation_time'
     ];
 
-    public function restaurant()
+   
+    public function category()
     {
-        return $this->belongsTo(Restaurant::class);
+       
+       return $this->belongsTo(RestaurantCategory::class, 'category_id');
     }
+
 
     protected $attributes = [
         'image' => 'default-image.png',

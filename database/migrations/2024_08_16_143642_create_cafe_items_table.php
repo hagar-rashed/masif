@@ -14,8 +14,8 @@ class CreateCafeItemsTable extends Migration
     public function up()
     {
         Schema::create('cafe_items', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('cafe_id')->constrained()->onDelete('cascade');           
+            $table->id();            
+            $table->foreignId('category_id')->constrained('cafe_categories')->onDelete('cascade');         
             $table->string('name');
             $table->text('description');
             $table->decimal('price_before_discount', 8, 2);

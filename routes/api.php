@@ -22,6 +22,8 @@ use App\Http\Controllers\Api\CafeBookingController;
 use App\Http\Controllers\Api\CafeItemController;
 use App\Http\Controllers\Api\CinemaController;
 use App\Http\Controllers\Api\MovieController;
+///////////////////////////////////////////   Amira gaber Profile///////////////////////
+use App\Http\Controllers\Api\ChatController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -89,6 +91,13 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     //-----------------------Offers-----------------
     Route::get('/offers', [OfferController::class, 'showOffers']);
+////////////////////////  chat amira gaber /////////////////////////////////////////////////////////////////
+    Route::post('/chats', [ChatController::class, 'startChat']);
+    Route::post('/chats/{chat_id}/messages', [ChatController::class, 'sendMessage']);
+    Route::get('/chats/{chat_id}/messages', [ChatController::class, 'getMessages']);
+    Route::get('/chats', [ChatController::class, 'getChats']);
+    Route::post('/messages/{message_id}/read',  [ChatController::class, 'markAsRead']);
+    Route::get('/notifications',  [ChatController::class, 'getNotifications']);
 });
 
 // services Route dashboard

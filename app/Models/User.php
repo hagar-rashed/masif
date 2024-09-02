@@ -50,4 +50,12 @@ class User extends Authenticatable
     public function bookings(){
         return $this->hasMany(Booking::class);
     }
+
+    // In the Message model
+
+public function sender()
+{
+    return $this->belongsTo(User::class, 'sender_id');
+}
+
 }

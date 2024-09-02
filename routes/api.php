@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\CinemaController;
 use App\Http\Controllers\Api\MovieController;
 ///////////////////////////////////////////   Amira gaber Profile///////////////////////
 use App\Http\Controllers\Api\ChatController;
+use App\Http\Controllers\Api\VisitController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -98,7 +99,17 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/chats', [ChatController::class, 'getChats']);
     Route::post('/messages/{message_id}/read',  [ChatController::class, 'markAsRead']);
     Route::get('/notifications',  [ChatController::class, 'getNotifications']);
+
+    Route::get('/visits', [VisitController::class, 'index']);
+    Route::get('/visits/{id}', [VisitController::class, 'show']);
+    Route::post('/visits', [VisitController::class, 'store']);    
+    Route::post('/visits/{id}', [VisitController::class, 'update']);
+    Route::delete('/visits/{id}', [VisitController::class, 'destroy']);
+
 });
+
+    
+
 
 // services Route dashboard
 Route::get('services', [ServiceController::class, 'index']);
@@ -194,6 +205,5 @@ Route::prefix('movies')->group(function(){
     Route::post('{id}', [MovieController::class, 'update']);
     Route::delete('{id}', [MovieController::class, 'destroy']);
 });
-
 
 

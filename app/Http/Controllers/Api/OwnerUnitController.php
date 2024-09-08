@@ -15,10 +15,10 @@ class OwnerUnitController extends Controller
     public function index()
     {
         try {
-            $userId = auth()->id(); // Get the ID of the currently authenticated user
+            //$userId = auth()->id(); // Get the ID of the currently authenticated user
             
             // Retrieve units for the authenticated user
-            $units = OwnerUnit::where('user_id', $userId)->with('images')->get();
+            $units = OwnerUnit::get();
             
             return response()->json($units, 200);
         } catch (\Exception $e) {
@@ -26,23 +26,24 @@ class OwnerUnitController extends Controller
         }
     }
 
-    public function show($id)
-    {
-        try {
-            $userId = auth()->id(); // Get the ID of the currently authenticated user
-            
-            // Retrieve the unit for the authenticated user
-            $unit = OwnerUnit::where('user_id', $userId)->with('images')->findOrFail($id);
-            
-            $this->formatImagePaths($unit);
-            return response()->json($unit, 200);
-        } catch (ModelNotFoundException $e) {
-            return response()->json(['error' => 'Unit not found'], 404);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to retrieve unit', 'details' => $e->getMessage()], 500);
+    
+        public function show($id)
+        {
+            try {
+                // Retrieve the unit by its ID without considering the authenticated user
+                $unit = OwnerUnit::find($id);
+        
+                // Check if the unit exists
+                if (!$unit) {
+                    return response()->json(['error' => 'Unit not found'], 404);
+                }
+                
+                return response()->json($unit, 200);
+            } catch (\Exception $e) {
+                return response()->json(['error' => 'Failed to retrieve unit', 'details' => $e->getMessage()], 500);
+            }
         }
-    }
-
+        
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [

@@ -26,6 +26,9 @@ use App\Http\Controllers\Api\MovieController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\VisitController;
 use App\Http\Controllers\Api\OwnerUnitController;
+use App\Http\Controllers\Api\OfferTripController;
+use App\Http\Controllers\Api\NotificationController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -115,6 +118,18 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/units/{id}', [OwnerUnitController::class, 'update']);
     Route::delete('/units/{id}', [OwnerUnitController::class, 'destroy']);
     Route::get('/myunits', [OwnerUnitController::class, 'ownerUnits']);
+
+    Route::get('/trips', [OfferTripController::class, 'index']);  
+    Route::get('/trips/{id}', [OfferTripController::class, 'show']);  
+    Route::post('/trips', [OfferTripController::class, 'store']);  
+    Route::post('/trips/{id}', [OfferTripController::class, 'update']);  
+    Route::delete('/trips/{id}', [OfferTripController::class, 'destroy']); 
+    Route::get('offer-trips/{userId}', [OfferTripController::class, 'getTripsByUser']);
+    Route::get('my-trips', [OfferTripController::class, 'getAuthenticatedUserTrips']);
+
+    Route::get('trip-notification', [NotificationController::class, 'getNotifications']);
+    Route::post('trip-notification/{id}/read', [NotificationController::class, 'markAsRead']);
+ 
 });
 
     

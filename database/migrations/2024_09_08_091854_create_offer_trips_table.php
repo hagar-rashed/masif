@@ -15,8 +15,10 @@ class CreateOfferTripsTable extends Migration
     {
         Schema::create('offer_trips', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id'); // Add this line
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade'); // Add this line
             $table->string('name'); 
-            $table->string('image');            
+            $table->string('image_path')->nullable();  // Make this nullable            
             $table->text('description');  // Trip description
             $table->float('rating')->default(0);  // Trip rating
             $table->integer('reviews_count')->default(0);  // Number of reviews
@@ -27,7 +29,8 @@ class CreateOfferTripsTable extends Migration
             $table->string('transportation');  // Transportation info
             $table->string('hotel_name');  // Hotel or accommodation name
             $table->string('hotel_address');  // Hotel address
-            $table->decimal('bus_cost', 10, 2);  // Bus cost
+            $table->string('hotel_phone')->nullable();
+            $table->decimal('trip_cost', 10, 2);  // Bus cost
             $table->decimal('tax', 10, 2);  // Tax
             $table->decimal('total_cost', 10, 2);  // Total cost
             $table->timestamps();

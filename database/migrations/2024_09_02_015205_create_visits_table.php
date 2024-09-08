@@ -15,18 +15,20 @@ class CreateVisitsTable extends Migration
     {
         Schema::create('visits', function (Blueprint $table) {
             $table->id();
-            $table->enum('postulant_type', ['tenant', 'visitor']);
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('postulant_type');
             $table->string('name');
-            $table->text('purpose_of_visit');
+            $table->string('purpose_of_visit');
             $table->integer('number_of_individuals');
-            $table->time('visit_time_from');
-            $table->time('visit_time_to');
-            $table->string('duration_of_visit');
+            $table->dateTime('visit_time_from');
+            $table->dateTime('visit_time_to');
+            $table->string('duration_of_visit'); // Duration in minutes
             $table->boolean('pets')->default(false);
             $table->string('pet_type')->nullable();
             $table->boolean('entry_by_vehicle')->default(false);
             $table->string('vehicle_type')->nullable();
             $table->integer('accompanying_individuals')->default(0);
+            $table->string('qr_code_path')->nullable();
             $table->timestamps();
         });
     }

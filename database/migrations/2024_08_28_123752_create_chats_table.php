@@ -15,7 +15,6 @@ class CreateChatsTable extends Migration
     {
         Schema::create('chats', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('users'); // Assuming the company is also a user
             $table->foreignId('participant_one_id')->constrained('users');
             $table->foreignId('participant_two_id')->constrained('users');
             $table->timestamps();

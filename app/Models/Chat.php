@@ -10,7 +10,6 @@ class Chat extends Model
     use HasFactory;
 
     protected $fillable = [
-        'company_id', // Company involved in the chat
         'participant_one_id', // The first participant (could be owner or client)
         'participant_two_id'  // The second participant (could be owner or client)
     ];

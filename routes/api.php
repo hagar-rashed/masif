@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\MovieController;
 ///////////////////////////////////////////   Amira gaber Profile///////////////////////
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\VisitController;
+use App\Http\Controllers\Api\OwnerUnitController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -99,13 +100,21 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/chats', [ChatController::class, 'getChats']);
     Route::post('/messages/{message_id}/read',  [ChatController::class, 'markAsRead']);
     Route::get('/notifications',  [ChatController::class, 'getNotifications']);
+    Route::get('/search-participants', [ChatController::class, 'searchParticipants']);
 
     Route::get('/visits', [VisitController::class, 'index']);
     Route::get('/visits/{id}', [VisitController::class, 'show']);
     Route::post('/visits', [VisitController::class, 'store']);    
     Route::post('/visits/{id}', [VisitController::class, 'update']);
     Route::delete('/visits/{id}', [VisitController::class, 'destroy']);
+    Route::get('validate-qr/{visitId}', [VisitController::class, 'validateQrCode']);
 
+    Route::get('/units', [OwnerUnitController::class, 'index']);
+    Route::post('/units', [OwnerUnitController::class, 'store']);
+    Route::get('/units/{id}', [OwnerUnitController::class, 'show']);
+    Route::post('/units/{id}', [OwnerUnitController::class, 'update']);
+    Route::delete('/units/{id}', [OwnerUnitController::class, 'destroy']);
+    Route::get('/myunits', [OwnerUnitController::class, 'ownerUnits']);
 });
 
     

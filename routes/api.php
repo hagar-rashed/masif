@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\VisitController;
 use App\Http\Controllers\Api\OwnerUnitController;
 use App\Http\Controllers\Api\OfferTripController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\OfferBookingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -129,6 +130,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::get('trip-notification', [NotificationController::class, 'getNotifications']);
     Route::post('trip-notification/{id}/read', [NotificationController::class, 'markAsRead']);
+
+    Route::post('/offer-trip/{trip_offer}/book', [OfferBookingController::class, 'store']);
  
 });
 

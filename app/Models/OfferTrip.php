@@ -18,6 +18,7 @@ class OfferTrip extends Model
         'start_time',
         'end_time',
         'destination',
+        'places',
         'trip_schedule',
         'transportation',
         'hotel_name',

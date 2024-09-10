@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Notifications\NewChatNotification;
+use Illuminate\Support\Facades\App;
 
 class ChatController extends Controller
 {
@@ -34,24 +35,52 @@ class ChatController extends Controller
     }
     
 
+ 
+    // Start a chat between two participants, preventing duplicate chats
     public function startChat(Request $request)
     {
         $request->validate([
             'participant_two_id' => 'required|exists:users,id',
         ]);
-    
-        $chat = Chat::create([
-            'participant_one_id' => Auth::id(),
-            'participant_two_id' => $request->participant_two_id,
-        ]);
-    
-        // Send a notification to the second participant
-        $chat->participantTwo->notify(new NewChatNotification($chat));
-    
-        return response()->json([
-            'status' => 'Chat Started',
-            'chat' => $chat
-        ], 201);
+
+        $authUserId = Auth::id();
+        $participantTwoId = $request->participant_two_id;
+
+        if ($authUserId === $participantTwoId) {
+            return response()->json(['status' => 'Error', 'message' => 'Cannot start a chat with yourself'], 400);
+        }
+
+        try {
+            $existingChat = Chat::where(function ($query) use ($authUserId, $participantTwoId) {
+                $query->where('participant_one_id', $authUserId)
+                      ->where('participant_two_id', $participantTwoId);
+            })->orWhere(function ($query) use ($authUserId, $participantTwoId) {
+                $query->where('participant_one_id', $participantTwoId)
+                      ->where('participant_two_id', $authUserId);
+            })->first();
+
+            if ($existingChat) {
+                return response()->json([
+                    'status' => 'Chat already exists',
+                    'chat' => $existingChat
+                ], 200);
+            }
+
+            $chat = Chat::create([
+                'participant_one_id' => $authUserId,
+                'participant_two_id' => $participantTwoId,
+            ]);
+
+            $chat->participantTwo->notify(new NewChatNotification($chat));
+
+            return response()->json([
+                'status' => 'Chat Started',
+                'chat' => $chat
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error('Error starting chat: ' . $e->getMessage());
+            return response()->json(['status' => 'Error', 'message' => 'Failed to start chat'], 500);
+        }
     }
     
 
@@ -93,82 +122,99 @@ class ChatController extends Controller
 
 public function getMessages($chat_id)
 {
-    $chat = Chat::findOrFail($chat_id);
-    $messages = Message::where('chat_id', $chat->id)
-        ->with('sender') // Include sender data
-        ->get()
-        ->map(function ($message) {
-            return [
-                'id' => $message->id,
-                'chat_id' => $message->chat_id,
-                'sender_id' => $message->sender_id,
-                'receiver_id' => $message->receiver_id,
-                'message' => $message->message,
-                'is_read' => $message->is_read,
-                'created_at' => $message->created_at->diffForHumans(), // Formatted time
-                'updated_at' => $message->updated_at,
-                'sender_name' => $message->sender->name,// Fetch the sender's image
-                'sender_image' => $message->sender->image // Fetch the sender's image
-            ];
-        });
+    try {
+        $chat = Chat::findOrFail($chat_id);
+        $authUserId = Auth::id();
 
-    return response()->json([
-        'status' => 'Messages Retrieved',
-        'messages' => $messages
-    ], 200);
+        // Temporarily set the locale to English
+        App::setLocale('en');
+
+        $messages = Message::where('chat_id', $chat->id)
+            ->with('sender')
+            ->get()
+            ->map(function ($message) use ($authUserId) {
+                $isSent = $message->sender_id == $authUserId;
+                return [
+                    'id' => $message->id,
+                    'chat_id' => $message->chat_id,
+                    'sender_id' => $message->sender_id,
+                    'receiver_id' => $message->receiver_id,
+                    'message' => $message->message,
+                    'is_sent' => $isSent,
+                    'is_read' => $message->is_read,
+                    'created_at' => $message->created_at,
+                    'updated_at' => $message->updated_at,
+                    'sender_name' => $message->sender->name,
+                    'sender_image' => $message->sender->image,
+                ];
+            });
+
+        return response()->json([
+            'status' => 'Messages Retrieved',
+            'messages' => $messages
+        ], 200);
+    } catch (\Exception $e) {
+        Log::error('Error retrieving messages: ' . $e->getMessage());
+        return response()->json(['status' => 'Error', 'message' => 'Failed to retrieve messages'], 500);
+    }
 }
+
 
 public function getChats()
-{
-    $authUserId = Auth::id();
+    {
+        try {
+            $authUserId = Auth::id();
 
-    // Retrieve chats where the authenticated user is one of the participants
-    $chats = Chat::where('participant_one_id', $authUserId)
-                 ->orWhere('participant_two_id', $authUserId)
-                 ->with(['participantOne', 'participantTwo', 'messages' => function ($query) {
-                     // Order messages by creation date to get the latest message first
-                     $query->orderBy('created_at', 'desc');
-                 }])
-                 ->get()
-                 ->map(function ($chat) use ($authUserId) {
-                     // Determine the receiver based on the authenticated user
-                     $receiver = $chat->participant_one_id == $authUserId ? $chat->participantTwo : $chat->participantOne;
+            // Temporarily set the locale to English
+            App::setLocale('en');
 
-                     // Get the unread message count for the authenticated user
-                     $unreadMessagesCount = $chat->messages
-                         ->where('receiver_id', $authUserId)
-                         ->where('is_read', false) // Only count unread messages
-                         ->count();
+            $chats = Chat::where('participant_one_id', $authUserId)
+                         ->orWhere('participant_two_id', $authUserId)
+                         ->with(['participantOne', 'participantTwo', 'messages' => function ($query) {
+                             $query->orderBy('created_at', 'desc');
+                         }])
+                         ->get()
+                         ->map(function ($chat) use ($authUserId) {
+                             $receiver = $chat->participant_one_id == $authUserId 
+                                 ? $chat->participantTwo 
+                                 : $chat->participantOne;
 
-                     // Get the latest message (first because messages are ordered by 'created_at')
-                     $lastMessage = $chat->messages->first();
+                             $unreadMessagesCount = $chat->messages
+                                 ->where('receiver_id', $authUserId)
+                                 ->where('is_read', false)
+                                 ->count();
 
-                     return [
-                         'chat_id' => $chat->id,
-                         'receiver' => [
-                             'id' => $receiver->id,
-                             'name' => $receiver->name,
-                             'image' => $receiver->image
-                         ],
-                         'unread_messages_count' => $unreadMessagesCount, // Unread messages count
-                         'last_message' => $lastMessage ? [
-                             'id' => $lastMessage->id,
-                             'message' => $lastMessage->message,
-                             'sender_id' => $lastMessage->sender_id,
-                             'is_read' => $lastMessage->is_read, // 'is_read' status
-                             'created_at' => $lastMessage->created_at->diffForHumans(), // Formatted time
-                         ] : null, // Handle cases where there is no message
-                         'created_at' => $chat->created_at,
-                         'updated_at' => $chat->updated_at,
-                     ];
-                 });
+                             $lastMessage = $chat->messages->first();
 
-    return response()->json([
-        'status' => 'Chats Retrieved',
-        'chats' => $chats
-    ], 200);
-}
+                             return [
+                                 'chat_id' => $chat->id,
+                                 'receiver' => [
+                                     'id' => $receiver->id,
+                                     'name' => $receiver->name,
+                                     'image' => $receiver->image
+                                 ],
+                                 'unread_messages_count' => $unreadMessagesCount,
+                                 'last_message' => $lastMessage ? [
+                                     'id' => $lastMessage->id,
+                                     'message' => $lastMessage->message,
+                                     'sender_id' => $lastMessage->sender_id,
+                                     'is_read' => $lastMessage->is_read,
+                                     'created_at' => $lastMessage->created_at->diffForHumans(),
+                                 ] : null,
+                                 'created_at' => $chat->created_at,
+                                 'updated_at' => $chat->updated_at,
+                             ];
+                         });
 
+            return response()->json([
+                'status' => 'Chats Retrieved',
+                'chats' => $chats
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Error retrieving chats: ' . $e->getMessage());
+            return response()->json(['status' => 'Error', 'message' => 'Failed to retrieve chats'], 500);
+        }
+    }
 
 
 

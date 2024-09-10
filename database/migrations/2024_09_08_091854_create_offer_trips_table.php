@@ -24,7 +24,8 @@ class CreateOfferTripsTable extends Migration
             $table->integer('reviews_count')->default(0);  // Number of reviews
             $table->dateTime('start_time');  // Start time of the trip
             $table->dateTime('end_time');  // End time of the trip
-            $table->string('destination');  // Destination of the trip
+            $table->string('destination'); 
+            $table->string('places');  // Destination of the trip
             $table->text('trip_schedule');  // Trip schedule
             $table->string('transportation');  // Transportation info
             $table->string('hotel_name');  // Hotel or accommodation name

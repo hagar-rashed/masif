@@ -28,7 +28,11 @@ use App\Http\Controllers\Api\VisitController;
 use App\Http\Controllers\Api\OwnerUnitController;
 use App\Http\Controllers\Api\OfferTripController;
 use App\Http\Controllers\Api\NotificationController;
+
+
 use App\Http\Controllers\Api\OfferBookingController;
+use App\Http\Controllers\Api\HotelController;
+use App\Http\Controllers\Api\RoomController;
 
 /*
 |--------------------------------------------------------------------------
@@ -132,6 +136,21 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('trip-notification/{id}/read', [NotificationController::class, 'markAsRead']);
 
     Route::post('/offer-trip/{trip_offer}/book', [OfferBookingController::class, 'store']);
+
+
+    Route::get('hotels', [HotelController::class, 'index']);
+    Route::post('hotels', [HotelController::class, 'store']);
+    Route::get('hotels/{id}', [HotelController::class, 'show']);
+    Route::post('hotels/{id}', [HotelController::class, 'update']);
+    Route::delete('hotels/{id}', [HotelController::class, 'destroy']);
+    Route::get('hotels/{id}/rooms', [HotelController::class, 'rooms']);
+
+    Route::get('rooms', [RoomController::class, 'index']);
+    Route::post('rooms', [RoomController::class, 'store']);
+    Route::get('rooms/{id}', [RoomController::class, 'show']);
+    Route::post('rooms/{id}', [RoomController::class, 'update']);
+    Route::delete('rooms/{id}', [RoomController::class, 'destroy']);  
+    
  
 });
 
@@ -188,6 +207,8 @@ Route::prefix('menu-items')->group(function(){
     Route::post('category/{category_id}/{id}', [MenuItemController::class, 'update']);  
     Route::delete('{id}', [MenuItemController::class, 'destroy']);
     Route::post('cart/add', [MenuItemController::class, 'addToCart']);
+   
+
 });
 
 Route::prefix('cafes')->group(function(){

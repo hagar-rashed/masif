@@ -17,6 +17,8 @@ class CreateOfferTripsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id'); // Add this line
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade'); // Add this line
+            $table->unsignedBigInteger('tourism_id'); // Add this line
+            $table->foreign('tourism_id')->references('id')->on('tourisms')->onDelete('cascade'); // Add this line
             $table->string('name'); 
             $table->string('image_path')->nullable();  // Make this nullable            
             $table->text('description');  // Trip description
@@ -24,8 +26,7 @@ class CreateOfferTripsTable extends Migration
             $table->integer('reviews_count')->default(0);  // Number of reviews
             $table->dateTime('start_time');  // Start time of the trip
             $table->dateTime('end_time');  // End time of the trip
-            $table->string('destination'); 
-            $table->string('places');  // Destination of the trip
+            $table->string('destination');  // Destination of the trip
             $table->text('trip_schedule');  // Trip schedule
             $table->string('transportation');  // Transportation info
             $table->string('hotel_name');  // Hotel or accommodation name

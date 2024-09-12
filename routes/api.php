@@ -33,6 +33,9 @@ use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OfferBookingController;
 use App\Http\Controllers\Api\HotelController;
 use App\Http\Controllers\Api\RoomController;
+use App\Http\Controllers\Api\OtherController;
+use App\Http\Controllers\Api\TourismController;
+use App\Http\Controllers\Api\FavoritesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -124,18 +127,42 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::delete('/units/{id}', [OwnerUnitController::class, 'destroy']);
     Route::get('/myunits', [OwnerUnitController::class, 'ownerUnits']);
 
+
+
+///////////////////////////// 12 sept/////////////////////////////////////////////////////////////
+
     Route::get('/trips', [OfferTripController::class, 'index']);  
     Route::get('/trips/{id}', [OfferTripController::class, 'show']);  
-    Route::post('/trips', [OfferTripController::class, 'store']);  
+    Route::post('/tourisms/{tourismId}/trips', [OfferTripController::class, 'store']);  
     Route::post('/trips/{id}', [OfferTripController::class, 'update']);  
     Route::delete('/trips/{id}', [OfferTripController::class, 'destroy']); 
     Route::get('offer-trips/{userId}', [OfferTripController::class, 'getTripsByUser']);
-    Route::get('my-trips', [OfferTripController::class, 'getAuthenticatedUserTrips']);
-
+    Route::get('my-trips', [OfferTripController::class, 'getAuthenticatedUserTrips']);  
     Route::get('trip-notification', [NotificationController::class, 'getNotifications']);
     Route::post('trip-notification/{id}/read', [NotificationController::class, 'markAsRead']);
 
-    Route::post('/offer-trip/{trip_offer}/book', [OfferBookingController::class, 'store']);
+    Route::get('others', [OtherController::class, 'index']);
+    Route::post('others', [OtherController::class, 'store']);
+    Route::get('others/{id}', [OtherController::class, 'show']);
+    Route::post('others/{id}', [OtherController::class, 'update']);
+    Route::delete('others/{id}', [OtherController::class, 'destroy']);  
+
+    Route::get('tourisms', [TourismController::class, 'index']);
+    Route::post('tourisms', [TourismController::class, 'store']);
+    Route::get('tourisms/{id}', [TourismController::class, 'show']);
+    Route::post('tourisms/{id}', [TourismController::class, 'update']);
+    Route::delete('tourisms/{id}', [TourismController::class, 'destroy']);
+    Route::get('/tourisms/{tourism}/trips', [TourismController::class, 'getTripsByTourism']);  
+
+
+    Route::get('/favorites', [FavoritesController::class, 'index']);
+    Route::post('/favorites', [FavoritesController::class, 'store']);
+    Route::delete('/favorites', [FavoritesController::class, 'destroy']);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    
+
 
 
     Route::get('hotels', [HotelController::class, 'index']);
@@ -150,7 +177,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('rooms/{id}', [RoomController::class, 'show']);
     Route::post('rooms/{id}', [RoomController::class, 'update']);
     Route::delete('rooms/{id}', [RoomController::class, 'destroy']);  
-    
+
+   
  
 });
 

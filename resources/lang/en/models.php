@@ -1,6 +1,8 @@
 <?php
 
 return [
+
+    "Trip not found."          =>"Trip not found.",
     'home'                      => 'Home',
     'about'                     => 'About the Author',
     'books'                     => 'Books and literature',

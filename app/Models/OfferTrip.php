@@ -9,7 +9,8 @@ class OfferTrip extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'user_id',  // Add this line
+        'user_id',  
+        'tourism_id',
         'name',
         'description',
         'image_path',  
@@ -33,5 +34,17 @@ class OfferTrip extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function tourism()
+    {
+        return $this->belongsTo(Tourism::class);
+    }
+
+    public function favorites()
+    {
+        return $this->morphMany(Favorite::class, 'favoritable');
+    }
+    
+
 
 }

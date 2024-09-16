@@ -20,6 +20,8 @@ class Movie extends Model
         'release_year',
         'director',
         'cast',
+        'adult_price',
+        'child_price',
     ];
     
     public function cinema()

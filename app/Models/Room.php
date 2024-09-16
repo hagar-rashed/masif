@@ -9,41 +9,19 @@ use Carbon\Carbon;
 class Room extends Model
 {
     protected $fillable = [
-        'hotel_id',
-        'room_type',
-        'from_date',
-        'to_date',
-        'number_of_rooms',
-        'price_per_night',
-        'number_of_nights',
-        'original_price',
-        'discount',
-        'total_price',
-        'payment_method',
-        'description',
-        'facilities',
+        'hotel_id', 'room_type', 'number_of_beds', 'service', 'night_price','image_path','space',
+        'description', 'facilities', 'payment_method', 'discount'
     ];
 
     protected $casts = [
-        'from_date' => 'date',
-        'to_date' => 'date',
-        'facilities' => 'array',
+        'facilities' => 'array', // Assuming facilities is stored as JSON
     ];
 
-    public function getAvailabilityAttribute()
+    public function availability()
     {
-        // Ensure 'from_date' and 'to_date' are Carbon instances before using them
-        $fromDate = $this->from_date instanceof Carbon ? $this->from_date : Carbon::parse($this->from_date);
-        $toDate = $this->to_date instanceof Carbon ? $this->to_date : Carbon::parse($this->to_date);
-
-        return [
-            'from_date' => $fromDate->toDateString(),
-            'to_date' => $toDate->toDateString(),
-        ];
+        return $this->hasMany(RoomAvailability::class);
     }
-
-
-
+    
        
         // A room belongs to a hotel
         public function hotel()
@@ -56,9 +34,8 @@ class Room extends Model
         return $this->morphMany(Favorite::class, 'favoritable');
     }
 
-       
     
-
+   
         
         
     }

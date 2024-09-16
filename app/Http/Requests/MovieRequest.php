@@ -34,7 +34,9 @@ class MovieRequest extends FormRequest
             'runtime' => 'required|date_format:H:i',
             'release_year' => 'required|integer|digits:4',
             'director' => 'required|string|max:255',
-            'cast' => 'required|string'
+            'cast' => 'required|string',
+            'adult_price' => 'required|numeric|min:0',  
+            'child_price' => 'required|numeric|min:0'
         ];
     }
 }

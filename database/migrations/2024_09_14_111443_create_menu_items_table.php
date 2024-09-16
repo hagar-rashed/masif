@@ -14,7 +14,7 @@ class CreateMenuItemsTable extends Migration
     public function up()
     {
         Schema::create('menu_items', function (Blueprint $table) {
-            $table->id();            
+            $table->id();
             $table->foreignId('category_id')->constrained('restaurant_categories')->onDelete('cascade');    
             $table->string('name');
             $table->text('description');
@@ -24,7 +24,7 @@ class CreateMenuItemsTable extends Migration
             $table->string('image')->nullable();
             $table->decimal('rating');
             $table->decimal('purchase_rate');
-            $table->integer('preparation_time');           
+            $table->integer('preparation_time');         
             $table->timestamps();
         });
     }

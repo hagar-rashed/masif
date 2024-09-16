@@ -44,6 +44,8 @@ class OfferTrip extends Model
     {
         return $this->morphMany(Favorite::class, 'favoritable');
     }
+
+  
     
 
 

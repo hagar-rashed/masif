@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class CafeItem extends Model
 {
     use HasFactory;
+    protected $table = 'cafe_items';
+
 
     protected $fillable = [
         'category_id','name', 'description', 'price_before_discount','price_after_discount', 'calories', 'image', 'rating', 'purchase_rate', 'preparation_time'

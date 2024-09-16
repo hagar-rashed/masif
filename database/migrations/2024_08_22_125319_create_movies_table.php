@@ -26,6 +26,8 @@ class CreateMoviesTable extends Migration
             $table->year('release_year');           
             $table->string('director');
             $table->text('cast');
+            $table->decimal('adult_price', 8, 2); // Add adult price column
+            $table->decimal('child_price', 8, 2); // Add child price column
             $table->timestamps();
         });
     

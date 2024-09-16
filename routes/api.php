@@ -37,6 +37,11 @@ use App\Http\Controllers\Api\OtherController;
 use App\Http\Controllers\Api\TourismController;
 use App\Http\Controllers\Api\FavoritesController;
 
+
+use App\Http\Controllers\Api\TripBookingController;
+use App\Http\Controllers\Api\MovieBookingController;
+use App\Http\Controllers\Api\RoomBookingController;
+use App\Http\Controllers\Api\MyQRCodeController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -158,6 +163,24 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/favorites', [FavoritesController::class, 'index']);
     Route::post('/favorites', [FavoritesController::class, 'store']);
     Route::delete('/favorites', [FavoritesController::class, 'destroy']);
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    Route::post('trips/{trip_offer}/book', [TripBookingController::class, 'store']);
+    Route::get('trip-bookings/{trip_booking}', [TripBookingController::class, 'show']);
+    Route::delete('trip-bookings/{trip_booking}', [TripBookingController::class, 'destroy']);
+
+    Route::post('movies/{movie}/book', [MovieBookingController::class, 'store']);
+    Route::get('/movie-bookings/{id}', [MovieBookingController::class, 'show']);
+    Route::delete('/movie-bookings/{id}', [MovieBookingController::class, 'destroy']);
+
+
+    Route::post('/room-bookings', [RoomBookingController::class, 'store']);
+    Route::get('/room-bookings/{id}', [RoomBookingController::class, 'show']);
+    Route::delete('/room-bookings/{id}', [RoomBookingController::class, 'destroy']);
+
+    Route::get('my-qrcodes', [MyQRCodeController::class, 'myQRCodes']);
+    Route::delete('/my-qrcodes/{id}/{type}', [MyQRCodeController::class, 'destroy']);
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

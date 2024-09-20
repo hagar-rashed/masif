@@ -16,6 +16,7 @@ class CreateCafeBookingsTable extends Migration
         Schema::create('cafe_bookings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('cafe_id')->constrained('cafes')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); 
             $table->string('full_name');
             $table->string('mobile_number');
             $table->timestamp('appointment_time');

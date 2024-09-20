@@ -32,7 +32,8 @@ class MovieRequest extends FormRequest
             'description' => 'required|string',
             'certificate' => 'required|string|max:5',
             'runtime' => 'required|date_format:H:i',
-            'release_year' => 'required|integer|digits:4',
+            'release_year' => 'required|integer',
+            'runtime' => 'required|regex:/^[0-9]{2}:[0-5][0-9]$/', // Validate hh:mm format
             'director' => 'required|string|max:255',
             'cast' => 'required|string',
             'adult_price' => 'required|numeric|min:0',  

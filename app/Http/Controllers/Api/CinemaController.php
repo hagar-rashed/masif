@@ -15,9 +15,9 @@ class CinemaController extends Controller
         try {
             $cinemas = Cinema::all();
 
-            // Add the complete path for image_url
+            // Return only the image path without the full URL
             foreach ($cinemas as $cinema) {
-                $cinema->image_url = $cinema->image_url ? asset('storage/' . $cinema->image_url) : null;
+                $cinema->image_url = $cinema->image_url ? $cinema->image_url : null;
             }
 
             return response()->json($cinemas, 200);
@@ -31,12 +31,12 @@ class CinemaController extends Controller
         try {
             $cinema = Cinema::with('movies')->findOrFail($id);
 
-            // Add the complete path for cinema image_url
-            $cinema->image_url = $cinema->image_url ? asset('storage/' . $cinema->image_url) : null;
+            // Return only the cinema image path
+            $cinema->image_url = $cinema->image_url ? $cinema->image_url : null;
 
-            // Add the complete path for each movie's image_url
+            // Return only the movie image paths
             foreach ($cinema->movies as $movie) {
-                $movie->image_url = $movie->image_url ? asset('storage/' . $movie->image_url) : null;
+                $movie->image_url = $movie->image_url ? $movie->image_url : null;
             }
 
             return response()->json($cinema, 200);
@@ -61,8 +61,8 @@ class CinemaController extends Controller
 
             $cinema = Cinema::create($validatedData);
 
-            // Optionally, return the image URL
-            $cinema->image_url = isset($validatedData['image_url']) ? asset('storage/' . $validatedData['image_url']) : null;
+            // Return only the image path
+            $cinema->image_url = $validatedData['image_url'] ?? null;
 
             return response()->json($cinema, 201);
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -84,7 +84,7 @@ class CinemaController extends Controller
             // Check if a new image file is provided
             if ($request->hasFile('image_url')) {
                 // Extract the image path from the existing URL
-                $oldImagePath = str_replace(asset('storage/'), '', $cinema->image_url);
+                $oldImagePath = $cinema->image_url;
 
                 // Delete the old image if it exists in the storage
                 if (Storage::disk('public')->exists($oldImagePath)) {
@@ -99,8 +99,8 @@ class CinemaController extends Controller
             // Update the cinema with the new data
             $cinema->update($validatedData);
 
-            // Update the image URL with the public path
-            $cinema->image_url = asset('storage/' . $cinema->image_url);
+            // Return only the image path
+            $cinema->image_url = $cinema->image_url;
 
             return response()->json($cinema, 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
@@ -111,6 +111,8 @@ class CinemaController extends Controller
             return response()->json(['error' => 'An unexpected error occurred while updating the cinema. Please try again later.'], 500);
         }
     }
+
+
 
     public function destroy($id)
     {
@@ -145,7 +147,8 @@ class CinemaController extends Controller
 
             // Add the complete path for each movie's image_url
             foreach ($cinema->movies as $movie) {
-                $movie->image_url = $movie->image_url ? asset('storage/' . $movie->image_url) : null;
+                $movie->image_url = $movie->image_url ? $movie->image_url : null;
+
             }
 
             return response()->json($cinema->movies, 200);
@@ -155,4 +158,6 @@ class CinemaController extends Controller
             return response()->json(['error' => 'An unexpected error occurred while retrieving the movies. Please try again later.'], 500);
         }
     }
+
+   
 }

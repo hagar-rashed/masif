@@ -9,7 +9,7 @@ use Carbon\Carbon;
 class Room extends Model
 {
     protected $fillable = [
-        'hotel_id', 'room_type', 'number_of_beds', 'service', 'night_price','image_path','space',
+        'hotel_id', 'room_type', 'number_of_beds', 'service', 'night_price','space',
         'description', 'facilities', 'payment_method', 'discount'
     ];
 
@@ -22,21 +22,25 @@ class Room extends Model
         return $this->hasMany(RoomAvailability::class);
     }
     
-       
-        // A room belongs to a hotel
-        public function hotel()
-        {
-            return $this->belongsTo(Hotel::class);
-        }
-    
-        public function favorites()
+    public function hotel()
+    {
+        return $this->belongsTo(Hotel::class);
+    }
+
+    public function favorites()
     {
         return $this->morphMany(Favorite::class, 'favoritable');
     }
 
-    
-   
-        
-        
+    public function images()
+    {
+        return $this->hasMany(RoomImage::class);
     }
+    
+    public function offers()
+    {
+        return $this->hasMany(RoomOffer::class);
+    }
+        
+ }
 

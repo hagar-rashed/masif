@@ -17,9 +17,10 @@ class CreateHotelsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');  // Define 'user_id' column
             $table->string('name');
-            $table->string('image_path')->nullable();
             $table->string('qr_code')->nullable();
             $table->string('phone')->nullable();
+            $table->decimal('latitude', 10, 7)->nullable(); 
+            $table->decimal('longitude', 10, 7)->nullable(); 
             $table->string('location')->nullable();
             $table->integer('star_rating')->nullable();
             $table->json('services')->nullable();   // JSON field for services

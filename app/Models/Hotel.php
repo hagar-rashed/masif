@@ -17,6 +17,8 @@ use Illuminate\Database\Eloquent\Model;
             'location',
             'star_rating',
             'services',
+            'latitude', 
+            'longitude',
         ];
     
         // A hotel has many rooms

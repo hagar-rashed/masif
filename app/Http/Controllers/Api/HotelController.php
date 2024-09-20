@@ -6,12 +6,25 @@ use App\Models\Hotel;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Validation\ValidationException;
+use SimpleSoftwareIO\QrCode\Facades\QrCode; 
 
 class HotelController extends Controller
 {
     public function index() {
         try {
-            $hotels = Hotel::with('rooms')->get();
+            $hotels = Hotel::with(['images'])->get(); // Load associated hotel images
+
+            // Format image paths
+            $hotels->each(function ($hotel) {
+                $hotel->images->each(function ($image) {
+                    // Set image_path to the relative path
+                    $image->image_path = '' . $image->image_path;
+                });
+
+                // Include QR code path
+                $hotel->qr_code_url = '' . $hotel->qr_code;
+            });
+
             return response()->json([
                 'message' => 'Hotels retrieved successfully',
                 'data' => $hotels,
@@ -25,11 +38,20 @@ class HotelController extends Controller
     }
 
     public function show($id) {
-        $hotel = Hotel::with('rooms')->find($id);
+        $hotel = Hotel::with(['images'])->find($id); // Load associated hotel images
 
         if (!$hotel) {
             return response()->json(['error' => 'Hotel not found'], 404);
         }
+
+        // Format image paths
+        $hotel->images->each(function ($image) {
+            // Set image_path to the relative path
+            $image->image_path = '' . $image->image_path;
+        });
+
+        // Include QR code path
+        $hotel->qr_code_url = '' . $hotel->qr_code;
 
         return response()->json([
             'message' => 'Hotel retrieved successfully',
@@ -47,18 +69,21 @@ class HotelController extends Controller
                 'qr_code' => 'string|nullable',
                 'phone' => 'string|nullable',
                 'location' => 'string|nullable',
+                'latitude' => 'required|numeric',
+                'longitude' => 'required|numeric',
                 'star_rating' => 'integer|nullable',
                 'services' => 'array|nullable',
             ], $this->validationMessages());
-
+    
             $validated['user_id'] = auth()->id();
-
+    
             if ($request->hasFile('image_path')) {
                 $validated['image_path'] = $request->file('image_path')->store('hotels', 'public');
             }
-
+    
+            // Create the hotel entry
             $hotel = Hotel::create($validated);
-
+    
             // Handle multiple image uploads
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $image) {
@@ -66,7 +91,26 @@ class HotelController extends Controller
                     $hotel->images()->create(['image_path' => $imagePath]);
                 }
             }
-
+    
+            // Generate the QR code for the hotel data
+            $qrCodeData = [
+                'name' => $hotel->name,
+                'location' => $hotel->location,
+                'phone' => $hotel->phone,
+                'latitude' => $hotel->latitude,
+                'longitude' => $hotel->longitude,
+            ];
+            
+            // Convert the data to a JSON string for QR code
+            $qrCodeString = json_encode($qrCodeData);
+    
+            // Generate and store the QR code
+            $qrCodePath = 'qrcodes/' .  'hotel' . $hotel->id . '.png';
+            QrCode::format('png')->size(200)->generate($qrCodeString, public_path('storage/' . $qrCodePath));
+    
+            // Save the QR code path in the database
+            $hotel->update(['qr_code' => $qrCodePath]);
+    
             return response()->json([
                 'message' => 'Hotel created successfully',
                 'data' => $hotel->load('images'),
@@ -84,47 +128,74 @@ class HotelController extends Controller
         }
     }
 
-    public function update(Request $request, $id) {
-        try {
-            $hotel = Hotel::find($id);
+    public function update(Request $request, $id)
+{
+    $validator = Validator::make($request->all(), [
+        'room_type' => 'sometimes|required|string',
+        'number_of_beds' => 'sometimes|required|integer',
+        'service' => 'sometimes|required|string',
+        'space' => 'sometimes|required|string',
+        'night_price' => 'sometimes|required|integer',
+        'description' => 'nullable|string',
+        'facilities' => 'nullable|array',
+        'payment_method' => 'sometimes|required|string',
+        'discount' => 'nullable|integer',
+        'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Allow multiple images
+        'availability' => 'nullable|array',
+        'availability.*.start_date' => 'required_with:availability|date',
+        'availability.*.end_date' => 'required_with:availability|date|after_or_equal:availability.*.start_date',
+    ]);
 
-            if (!$hotel) {
-                return response()->json(['error' => 'Hotel not found'], 404);
-            }
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 400);
+    }
 
-            $validated = $request->validate([
-                'name' => 'string|nullable',
-                'image_path' => 'file|nullable',
-                'qr_code' => 'string|nullable',
-                'phone' => 'string|nullable',
-                'location' => 'string|nullable',
-                'star_rating' => 'integer|nullable',
-                'services' => 'array|nullable',
-            ], $this->validationMessages());
+    $room = Room::findOrFail($id);
 
-            // Handle image upload
-            if ($request->hasFile('image_path')) {
-                $validated['image_path'] = $request->file('image_path')->store('hotels', 'public');
-            }
+    // Update the room fields
+    $room->update($request->only([
+        'room_type', 'number_of_beds', 'service', 'space', 'night_price',
+        'description', 'facilities', 'payment_method', 'discount'
+    ]));
 
-            $hotel->update($validated);
+    // Handle image uploads if provided
+    if ($request->hasFile('images')) {
+        // Delete old images if needed, or keep them based on your requirements.
+        RoomImage::where('room_id', $room->id)->delete(); // This deletes old images
 
-            return response()->json([
-                'message' => 'Hotel updated successfully',
-                'data' => $hotel,
-            ], 200);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'error' => 'Validation error',
-                'message' => $e->errors(),
-            ], 422);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'An error occurred while updating the hotel',
-                'message' => $e->getMessage(),
-            ], 500);
+        foreach ($request->file('images') as $image) {
+            $imagePath = $image->store('rooms', 'public'); // Store each image
+
+            // Save the image path in the `room_images` table
+            RoomImage::create([
+                'room_id' => $room->id,
+                'image_path' => $imagePath,
+            ]);
         }
     }
+
+    // Update room availability if provided
+    if ($request->has('availability')) {
+        RoomAvailability::where('room_id', $room->id)->delete(); // Delete old availability records
+
+        foreach ($request->availability as $availability) {
+            RoomAvailability::create([
+                'room_id' => $room->id,
+                'start_date' => $availability['start_date'],
+                'end_date' => $availability['end_date'],
+            ]);
+        }
+    }
+
+    // Load the updated availability and images
+    $room->load('availability', 'images');
+
+    return response()->json([
+        'message' => 'Room updated successfully',
+        'room' => $room
+    ], 200);
+}
+
 
     public function destroy($id) {
         try {

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use SimpleQRCodeGenerator;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\Storage;
 use App\Models\CafeBooking;
@@ -31,8 +30,14 @@ class CafeBookingController extends Controller
             'payment_method' => 'required|in:cash,wallet,credit/debit/ATM',
         ]);
     
-        // Create the booking record
-        $booking = CafeBooking::create(array_merge($validatedData, ['cafe_id' => $cafe->id]));
+        // Get the authenticated user's ID
+        $userId = auth()->id();
+    
+        // Create the booking record and include the user_id
+        $booking = CafeBooking::create(array_merge($validatedData, [
+            'cafe_id' => $cafe->id,
+            'user_id' => $userId,  // Include the authenticated user's ID
+        ]));
     
         // Generate the QR code data as a string
         $qrData = json_encode([
@@ -45,29 +50,28 @@ class CafeBookingController extends Controller
             'cafe_location' => $cafe->location,
         ]);
     
-         // Generate the QR code image
-         $qrCode = QrCode::format('png')->size(300)->generate($qrData);
+        // Generate the QR code image
+        $qrCode = QrCode::format('png')->size(300)->generate($qrData);
     
-         // Generate a file name starting with "restaurant" and a unique identifier
-         $qrCodeFileName = 'cafe_' . uniqid() . '.png';
-     
-         // Define the path to store the QR code image in 'public/storage/bookings' folder
-         $qrCodePath = 'bookings/' . $qrCodeFileName;
-     
-         // Store the QR code image in the public storage path
-         Storage::disk('public')->put($qrCodePath, $qrCode);
-     
-         // Save the QR code path to the booking record
-         $booking->update(['qr_code_path' => $qrCodePath]);
-     
-         // Construct the full URL for the QR code
-         $qrCodeUrl = url('storage/' . $qrCodePath);
-     
-         return response()->json([
-             'message' => 'Booking created successfully',
-             'booking' => $booking,
-             'qr_code_url' => $qrCodeUrl
-         ], 201);
-     }
-}    
+        // Generate a file name starting with "cafe" and a unique identifier
+        $qrCodeFileName = 'cafe_' . uniqid() . '.png';
     
+        // Define the path to store the QR code image in 'public/storage/bookings' folder
+        $qrCodePath = 'bookings/' . $qrCodeFileName;
+    
+        // Store the QR code image in the public storage path
+        Storage::disk('public')->put($qrCodePath, $qrCode);
+    
+        // Save the QR code path to the booking record
+        $booking->update(['qr_code_path' => $qrCodePath]);
+    
+        // Construct the full URL for the QR code
+        $qrCodeUrl = url('storage/' . $qrCodePath);
+    
+        return response()->json([
+            'message' => 'Booking created successfully',
+            'booking' => $booking,
+            'qr_code_url' => $qrCodeUrl
+        ], 201);
+    }
+}

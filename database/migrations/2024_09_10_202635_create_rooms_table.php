@@ -16,7 +16,6 @@ class CreateRoomsTable extends Migration
         Schema::create('rooms', function (Blueprint $table) {
             $table->id();
             $table->foreignId('hotel_id')->constrained()->onDelete('cascade');
-            $table->string('image_path')->nullable();
             $table->string('room_type');
             $table->string('space');
             $table->integer('number_of_beds');
@@ -25,7 +24,7 @@ class CreateRoomsTable extends Migration
             $table->text('description')->nullable();
             $table->json('facilities')->nullable();
             $table->string('payment_method');
-            $table->integer('discount')->nullable();
+            $table->integer('discount')->nullable();           
             $table->timestamps();
 
             

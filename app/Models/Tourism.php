@@ -11,11 +11,14 @@ class Tourism extends Model
     protected $fillable = [
         'name',
         'image_url',
+        'qr_code',
         'phone',
         'location',
         'description',
         'facilities',
-        'rating'
+        'rating',
+        'latitude',
+        'longitude'
     ];
 
     protected $casts = [        

@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Favorite;
 use App\Models\OwnerUnit;
+use App\Models\OwnerUnitImage;
 use App\Models\Room;
+use App\Models\RoomImage;
 use App\Models\OfferTrip;
 
 class FavoritesController extends Controller
@@ -53,11 +55,11 @@ class FavoritesController extends Controller
     {
         switch ($type) {
             case 'room':
-                return Room::find($id);
+                return Room::with('images')->find($id);
             case 'trip':
                 return OfferTrip::find($id);
             case 'unit':
-                return OwnerUnit::find($id);
+                return OwnerUnit::with('images')->find($id);
             default:
                 return null;
         }

@@ -22,4 +22,9 @@ class Cinema extends Model
     {
         return $this->hasMany(Movie::class);
     }
+
+    public function screenings()
+    {
+        return $this->hasMany(Screening::class);
+    }
 }

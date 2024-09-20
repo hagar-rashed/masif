@@ -21,13 +21,11 @@ class CreateMoviesTable extends Migration
             $table->string('genre');
             $table->decimal('rating', 3, 1);
             $table->text('description');
-            $table->string('certificate');            
-            $table->time('runtime');
+            $table->string('certificate');          
             $table->year('release_year');           
             $table->string('director');
             $table->text('cast');
-            $table->decimal('adult_price', 8, 2); // Add adult price column
-            $table->decimal('child_price', 8, 2); // Add child price column
+            $table->string('runtime', 5); // Runtime format: 'hh:mm'
             $table->timestamps();
         });
     

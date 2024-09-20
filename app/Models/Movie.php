@@ -16,16 +16,20 @@ class Movie extends Model
         'rating',
         'description',
         'certificate',
-        'runtime',
         'release_year',
         'director',
-        'cast',
-        'adult_price',
-        'child_price',
+        'cast',        
+        'runtime',
+       
     ];
     
     public function cinema()
     {
         return $this->belongsTo(Cinema::class);
+    }
+
+    public function screenings()
+    {
+        return $this->hasMany(Screening::class);
     }
 }

@@ -15,9 +15,9 @@ class MovieController extends Controller
         try {
             $movies = Movie::all();
 
-            // Add the complete path for image_url
+            // Return only the image path for image_url
             foreach ($movies as $movie) {
-                $movie->image_url = $movie->image_url ? asset('storage/' . $movie->image_url) : null;
+                $movie->image_url = $movie->image_url ? $movie->image_url : null;
             }
 
             return response()->json($movies, 200);
@@ -31,8 +31,8 @@ class MovieController extends Controller
         try {
             $movie = Movie::findOrFail($id);
 
-            // Add the complete path for movie image_url
-            $movie->image_url = $movie->image_url ? asset('storage/' . $movie->image_url) : null;
+            // Return only the image path for movie image_url
+            $movie->image_url = $movie->image_url ? $movie->image_url : null;
 
             return response()->json($movie, 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
@@ -56,8 +56,8 @@ class MovieController extends Controller
 
             $movie = Movie::create($validatedData);
 
-            // Optionally, return the image URL
-            $movie->image_url = isset($validatedData['image_url']) ? asset('storage/' . $validatedData['image_url']) : null;
+            // Return only the image path
+            $movie->image_url = isset($validatedData['image_url']) ? $validatedData['image_url'] : null;
 
             return response()->json($movie, 201);
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -79,7 +79,7 @@ class MovieController extends Controller
             // Check if a new image file is provided
             if ($request->hasFile('image_url')) {
                 // Extract the image path from the existing URL
-                $oldImagePath = str_replace(asset('storage/'), '', $movie->image_url);
+                $oldImagePath = $movie->image_url;
 
                 // Delete the old image if it exists in the storage
                 if (Storage::disk('public')->exists($oldImagePath)) {
@@ -94,8 +94,8 @@ class MovieController extends Controller
             // Update the movie with the new data
             $movie->update($validatedData);
 
-            // Update the image URL with the public path
-            $movie->image_url = $movie->image_url ? asset('storage/' . $movie->image_url) : null;
+            // Return only the image path
+            $movie->image_url = $movie->image_url ? $movie->image_url : null;
 
             return response()->json($movie, 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
@@ -114,7 +114,7 @@ class MovieController extends Controller
 
             // Delete the movie's image if it exists
             if ($movie->image_url) {
-                $imagePath = str_replace(asset('storage/'), '', $movie->image_url);
+                $imagePath = $movie->image_url;
 
                 // Delete the image file from storage
                 if (Storage::disk('public')->exists($imagePath)) {

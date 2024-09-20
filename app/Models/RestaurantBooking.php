@@ -14,6 +14,7 @@ protected $table = 'restaurant_bookings';
 // The attributes that are mass assignable
 protected $fillable = [
     'restaurant_id',
+    'user_id',
     'full_name',
     'mobile_number',
     'appointment_time',

@@ -13,13 +13,13 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class AuthController extends Controller
 {
-    
 public function login_user(Request $request)
 {
     $request->validate([
         'email' => 'required',
         'password' => 'required',
         'user_type' => 'required|string|in:company,owner,visitor',
+        'id'=>'required_if:user_type,company',
     ]);
 
     // Attempt to authenticate the user
@@ -51,6 +51,7 @@ public function login_user(Request $request)
             'image' => $user->image, // Return the relative path to the image
             'email' => $user->email,
             'user_type' => $user->user_type,
+            'company_activity'=>($user->company_activity) ? $user->company_activity : null,
             'updated_at' => $user->updated_at->toIso8601String(),
             'created_at' => $user->created_at->toIso8601String(),
             'id' => $user->id,
@@ -61,6 +62,11 @@ public function login_user(Request $request)
 
 
 
+
+
+
+
+
 public function register_user(Request $request)
 {
     $request->validate([
@@ -68,7 +74,19 @@ public function register_user(Request $request)
         'email' => 'required|email|unique:users',
         'password' => 'required|confirmed',
         'user_type' => 'required|string|in:company,owner,visitor',
-        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validation for the image
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        'location' => 'nullable|string|max:255',
+        'latitude' => 'required|numeric',
+        'longitude' => 'required|numeric',
+        'commercial_record' => 'nullable|string|max:255',
+        'tax_card' => 'nullable|string|max:255',
+        // company_activity is required if the user_type is company and must be one of the specified options
+        'company_activity' => [
+            'required_if:user_type,company',
+            'nullable',
+            'string',
+            'in:restaurant,tourism,hotels,markets,additional'
+        ],
     ]);
 
     try {
@@ -81,46 +99,49 @@ public function register_user(Request $request)
         // Create the user
         $user = User::create([
             'name' => $request->name,
-            'image' => $imagePath, // Store only the relative path
+            'image' => $imagePath,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'user_type' => $request->user_type,
+            'location' => $request->location,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+            'commercial_record' => $request->commercial_record ?? null,
+            'tax_card' => $request->tax_card ?? null,
+            'company_activity' => $request->company_activity ?? null,
         ]);
 
-        // Define QR code data (e.g., user ID or email)
-        $qrData = $user->id; // Make sure this is a string or a properly formatted value
-        $qrDataString = (string)$qrData; // Convert to string if necessary
-
-        // Generate QR code
+        // Generate and save QR code
+        $qrData = $user->id;
+        $qrDataString = (string) $qrData;
         $qrCode = QrCode::format('png')->size(300)->generate($qrDataString);
-
-        // Generate a file name for the QR code
         $qrCodeFileName = 'user_' . uniqid() . '.png';
-
-        // Define the path to store the QR code image
         $qrCodePath = 'profile/' . $qrCodeFileName;
-
-        // Store the QR code image in the public storage path
         Storage::disk('public')->put($qrCodePath, $qrCode);
-
-        // Save the QR code path to the 'code' column in the user record
         $user->update(['code' => $qrCodePath]);
 
-        // Return the API response
+        // Return all user data in the API response
         return response()->json([
             'status' => 'User Registered',
             'token' => $user->createToken('Api Token of -' . $request->name)->plainTextToken,
             'user' => [
+                'id' => $user->id,
                 'name' => $user->name,
-                'image' => $user->image, // Return the relative path
                 'email' => $user->email,
                 'user_type' => $user->user_type,
-                'updated_at' => $user->updated_at->toIso8601String(),
+                'image' => $user->image,
+                'location' => $user->location,
+                'latitude' => $user->latitude,
+                'longitude' => $user->longitude,
+                'commercial_record' => $user->commercial_record,
+                'tax_card' => $user->tax_card,
+                'company_activity' => $user->company_activity,
+                'qr_code_path' => $user->code,
                 'created_at' => $user->created_at->toIso8601String(),
-                'id' => $user->id,
-            ],
-            'qr_code_path' => $qrCodePath // Return only the relative path of the QR code image
+                'updated_at' => $user->updated_at->toIso8601String(),
+            ]
         ], 200);
+
     } catch (Exception $e) {
         return response()->json([
             'status' => 'User Register Failed',
@@ -130,6 +151,13 @@ public function register_user(Request $request)
 }
 
 
+
+
+
+
+
+
+
     public function logout_user(){
         Auth::user()->currentAccessToken()->delete();
         return response()->json([
@@ -137,6 +165,29 @@ public function register_user(Request $request)
         ], 200);
     }
 
- 
+ public function getNotifications()
+    {
+        if (!auth()->check()) {
+            return response()->json([
+                'error' => 'Unauthenticated'
+            ], 401);
+        }
+    
+        $user = auth()->user();
+        $notifications = $user->notifications; // Fetch all notifications
+    
+        // Optionally, you can filter notifications based on type
+        $notifications = $notifications->filter(function ($notification) {
+            return in_array($notification->type, [
+                'App\Notifications\VillageNotification',
+                'App\Notifications\OfferNotification',
+                'App\Notifications\ChatMessageNotification'
+            ]);
+        });
+    
+        return response()->json([
+            'notifications' => $notifications
+        ]);
+    }
 
 }

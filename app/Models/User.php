@@ -19,12 +19,18 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
-        'user_name',
-        'image',
-        'email',
+       
+         'email',
         'password',
-        'isVerified',
         'user_type',
+        'image',
+        'location',
+        'latitude',
+        'longitude',
+        'commercial_record',
+        'tax_card',
+        'company_activity',
+        'isVerified',
         'code',
     ];
 
@@ -50,13 +56,33 @@ class User extends Authenticatable
     public function bookings(){
         return $this->hasMany(Booking::class);
     }
+     public function cafe()
+    {
+        return $this->hasOne(Cafe::class, 'user_id');
+    }
 
-    // In the Message model
-
-public function sender()
-{
-    return $this->belongsTo(User::class, 'sender_id');
-}
-
-
+    public function restaurant()
+    {
+        return $this->hasOne(Restaurant::class, 'user_id');
+    }
+    public function supermarket()
+    {
+        return $this->hasOne(Supermarket::class, 'user_id');
+    }
+    public function cinema()
+    {
+        return $this->hasOne(Cinema::class, 'user_id');
+    }
+    public function village()
+    {
+        return $this->hasOne(village::class, 'user_id');
+    }
+    public function service()
+    {
+        return $this->hasOne(Service::class, 'user_id');
+    }
+    public function unit()
+    {
+        return $this->hasOne(unit::class, 'user_id');
+    }
 }

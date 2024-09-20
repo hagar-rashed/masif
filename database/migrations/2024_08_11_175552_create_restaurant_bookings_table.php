@@ -16,6 +16,7 @@ class CreateRestaurantBookingsTable extends Migration
         Schema::create('restaurant_bookings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('restaurant_id')->constrained('restaurants')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Link to users
             $table->string('full_name');
             $table->string('mobile_number');
             $table->timestamp('appointment_time');

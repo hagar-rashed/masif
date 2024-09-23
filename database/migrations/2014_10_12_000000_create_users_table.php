@@ -14,18 +14,7 @@ class CreateUsersTable extends Migration
     public function up()
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            // $table->string('name');
-            // $table->string('image');
-            // $table->string('email')->unique();
-            // $table->enum('user_type', ['company', 'owner', 'visitor']);
-            // $table->timestamp('email_verified_at')->nullable();
-            // $table->string('password');
-            // $table->string('code')->unique()->nullable();
-            // $table->boolean('isVerified')->default(0);
-            // $table->string('social_id')->nullable();
-            // $table->string('social_type')->nullable();
-            // $table->rememberToken();
+            $table->id();            
             $table->string('name');
             $table->string('image')->nullable(); // Make image nullable
             $table->string('email')->unique();
@@ -39,7 +28,7 @@ class CreateUsersTable extends Migration
             $table->decimal('longitude', 11, 8)->nullable(); // Add longitude
             $table->string('commercial_record')->nullable(); // Add commercial record
             $table->string('tax_card')->nullable(); // Add tax card
-            $table->string('company_activity')->nullable(); // Add company activity
+            $table->enum('company_activity', ['restaurant', 'cafe', 'cinema','tourism','hotel','market','other']); // Restrict company activity            
             $table->string('social_id')->nullable();
             $table->string('social_type')->nullable();
             $table->rememberToken();

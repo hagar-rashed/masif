@@ -33,32 +33,49 @@ class CafeController extends Controller
 
    
 
+// public function show($id)
+// {
+//     try {
+//         $cafe = Cafe::with(['categories.items'])->findOrFail($id);
+
+//         // Ensure the image URL is complete, as in the store method
+//         if ($cafe->image_url) {
+//             $cafe->image_url = asset('storage/' . $cafe->image_url);
+//         }
+
+//         // Transform the categories and cafe items to include the complete image URL
+//         $cafe->categories->each(function ($category) {
+//             $category->cafeItems->each(function ($item) {
+//                 if ($item->image) {
+//                     $item->image_url = asset('storage/' . $item->image); // Assuming the image path is stored in the 'image' attribute
+//                 }
+//             });
+//         });
+
+//         return response()->json($cafe, 200);
+//     } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+//         return response()->json(['error' => 'Cafe not found.'], 404);
+//     } catch (\Exception $e) {
+//         return response()->json(['error' => 'An unexpected error occurred while retrieving the cafe. Please try again later.'], 500);
+//     }
+// }
+
 public function show($id)
 {
     try {
-        $cafe = Cafe::with(['categories.cafeItems'])->findOrFail($id);
-
-        // Ensure the image URL is complete, as in the store method
-        if ($cafe->image_url) {
-            $cafe->image_url = asset('storage/' . $cafe->image_url);
-        }
-
-        // Transform the categories and cafe items to include the complete image URL
-        $cafe->categories->each(function ($category) {
-            $category->cafeItems->each(function ($item) {
-                if ($item->image) {
-                    $item->image_url = asset('storage/' . $item->image); // Assuming the image path is stored in the 'image' attribute
-                }
-            });
-        });
-
+        $cafe = Cafe::with(['categories.items'])->findOrFail($id);
+        // Add the full image URL to the restaurant object
+        $cafe->image_url = $cafe->image_url ? asset('storage/' . $cafe->image_url) : null;
+          
+       
         return response()->json($cafe, 200);
     } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
         return response()->json(['error' => 'Cafe not found.'], 404);
     } catch (\Exception $e) {
-        return response()->json(['error' => 'An unexpected error occurred while retrieving the cafe. Please try again later.'], 500);
+        return response()->json(['error' => 'An unexpected error occurred while retrieving the restaurant. Please try again later.'], 500);
     }
 }
+
 
 
 
@@ -66,28 +83,54 @@ public function show($id)
     public function store(CafeRequest $request)
     {
     
+    // try {
+    //     $data = $request->validated();
+    //     $validatedData = $data; // Initialize validatedData
+
+    //     $data['user_id'] = auth()->id(); // Assign the currently authenticated user's ID
+
+
+    //     if ($request->hasFile('image_url')) {
+    //         $imagePath = $request->file('image_url')->store('cafes', 'public');
+    //         $validatedData['image_url'] = $imagePath;
+    //     }
+
+    //     $cafe = Cafe::create($validatedData);
+
+    //     // if (isset($validatedData['image_url'])) {
+    //     //     $cafe->image_url = asset('storage/' . $validatedData['image_url']);
+    //     // }
+    //     $restaurant->image_url = $restaurant->image_url ? asset('storage/' . $restaurant->image_url) : null;
+
+    //     return response()->json($cafe, 201);
+    // } catch (\Illuminate\Validation\ValidationException $e) {
+    //     return response()->json(['error' => $e->errors()], 422);
+    // } catch (\Exception $e) {
+    //     return response()->json(['error' => 'An unexpected error occurred while creating the restaurant. Please try again later.'], 500);
+    // }
+
+
     try {
         $data = $request->validated();
-        $validatedData = $data; // Initialize validatedData
+        $data['user_id'] = auth()->id(); // Assign the currently authenticated user's ID
 
         if ($request->hasFile('image_url')) {
-            $imagePath = $request->file('image_url')->store('cafes', 'public');
-            $validatedData['image_url'] = $imagePath;
+            $data['image_url'] = $request->file('image_url')->store('cafes', 'public');
         }
 
-        $cafe = Cafe::create($validatedData);
+        $cafe = Cafe::create($data);
 
-        if (isset($validatedData['image_url'])) {
-            $cafe->image_url = asset('storage/' . $validatedData['image_url']);
-        }
+        $cafe->image_url = $cafe->image_url ? asset('storage/' . $cafe->image_url) : null;
 
         return response()->json($cafe, 201);
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        return response()->json(['error' => $e->errors()], 422);
     } catch (\Exception $e) {
-        return response()->json(['error' => 'An unexpected error occurred while creating the restaurant. Please try again later.'], 500);
+        return response()->json(['error' => 'An unexpected error occurred while creating the restaurant.'], 500);
     }
 }
+
+
+
+
 
 
    // Update an existing cafe
@@ -97,6 +140,10 @@ public function update(CafeRequest $request, $id)
         $data = $request->validated();
 
         $cafe = Cafe::findOrFail($id);
+
+        if ($cafe->user_id !== auth()->id()) {
+            return response()->json(['error' => 'Unauthorized action.'], 403);
+        }
 
         if ($request->hasFile('image_url')) {
             // Delete the old image if it exists

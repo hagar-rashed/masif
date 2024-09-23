@@ -56,33 +56,52 @@ class User extends Authenticatable
     public function bookings(){
         return $this->hasMany(Booking::class);
     }
-     public function cafe()
+     public function cafes()
     {
-        return $this->hasOne(Cafe::class, 'user_id');
+        return $this->hasOne(Cafe::class);
     }
 
-    public function restaurant()
+    public function restaurants()
     {
-        return $this->hasOne(Restaurant::class, 'user_id');
+        return $this->hasMany(Restaurant::class);
     }
+
+    public function cinemas()
+    {
+        return $this->hasOne(Cinema::class);
+    }
+
+    public function hotels()
+    {
+        return $this->hasOne(Hotel::class);
+    }
+
+    public function tourisms()
+    {
+        return $this->hasOne(Tourism::class);
+    }
+    
     public function supermarket()
     {
-        return $this->hasOne(Supermarket::class, 'user_id');
+        return $this->hasOne(Supermarket::class);
     }
-    public function cinema()
+
+    public function others()
     {
-        return $this->hasOne(Cinema::class, 'user_id');
+        return $this->hasOne(Other::class);
     }
+    
+    
     public function village()
     {
-        return $this->hasOne(village::class, 'user_id');
+        return $this->hasOne(village::class);
     }
     public function service()
     {
-        return $this->hasOne(Service::class, 'user_id');
+        return $this->hasOne(Service::class);
     }
     public function unit()
     {
-        return $this->hasOne(unit::class, 'user_id');
+        return $this->hasOne(unit::class);
     }
 }

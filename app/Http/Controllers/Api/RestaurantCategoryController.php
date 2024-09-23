@@ -16,8 +16,9 @@ class RestaurantCategoryController extends Controller
     try {
         $restaurantCategories = RestaurantCategory::where('restaurant_id', $id)->get();
         foreach ($restaurantCategories as $category) {
-            $category->image_url = $category->image_url ? asset('storage/' . $category->image_url) : null;
+            $category->image_url = $category->image_url ? $category->image_url : null;  // Return only the path, not the full URL
         }
+
         return response()->json($restaurantCategories);
     } catch (\Exception $e) {
         return response()->json(['error' => 'An unexpected error occurred while retrieving categories. Please try again later.'], 500);
@@ -29,7 +30,8 @@ public function show($id)
 {
     try {
         $restaurantCategory = RestaurantCategory::findOrFail($id);
-        $restaurantCategory->image_url = $restaurantCategory->image_url ? asset('storage/' . $restaurantCategory->image_url) : null;
+        $restaurantCategory->image_url = $restaurantCategory->image_url ? $restaurantCategory->image_url : null;  // Return only the path, not the full URL
+
         return response()->json($restaurantCategory);
     } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
         return response()->json(['error' => 'Category not found.'], 404);

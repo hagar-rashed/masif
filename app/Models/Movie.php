@@ -28,8 +28,8 @@ class Movie extends Model
         return $this->belongsTo(Cinema::class);
     }
 
-    public function screenings()
+    public function screens()
     {
-        return $this->hasMany(Screening::class);
+        return $this->hasMany(Screen::class);
     }
 }

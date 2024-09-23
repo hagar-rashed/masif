@@ -18,25 +18,32 @@ class RestaurantController extends Controller
 {
    
     public function index()
-{
-    try {
-        $restaurants = Restaurant::with(['categories'])->get();
+    {
+        try {
+            $restaurants = Restaurant::with(['categories'])->get();
     
-        $restaurants->each(function ($restaurant) {
-            $restaurant->image_url = $restaurant->image_url ? asset('storage/' . $restaurant->image_url) : null;
-        });
+            $restaurants->each(function ($restaurant) {
+                // Format restaurant image URL
+                $restaurant->image_url = $restaurant->image_url ? asset('storage/' . $restaurant->image_url) : null;
+                
+                // Format category image URLs
+                $restaurant->categories->each(function ($category) {
+                    $category->image_url = $category->image_url ? asset('storage/' . $category->image_url) : null;
+                });
+            });
     
-        return response()->json($restaurants);
-    } catch (\Exception $e) {
-        return response()->json(['error' => 'An unexpected error occurred while retrieving restaurants. Please try again later.'], 500);
+            return response()->json($restaurants);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'An unexpected error occurred while retrieving restaurants. Please try again later.'], 500);
+        }
     }
-}
+    
     
 
 public function show($id)
 {
     try {
-        $restaurant = Restaurant::with(['categories'])->findOrFail($id);
+        $restaurant = Restaurant::with(['categories.items'])->findOrFail($id);
         // Add the full image URL to the restaurant object
         $restaurant->image_url = $restaurant->image_url ? asset('storage/' . $restaurant->image_url) : null;
           
@@ -54,24 +61,19 @@ public function store(RestaurantRequest $request)
 {
     try {
         $data = $request->validated();
-        $validatedData = $data; // Initialize validatedData
+        $data['user_id'] = auth()->id(); // Assign the currently authenticated user's ID
 
         if ($request->hasFile('image_url')) {
-            $imagePath = $request->file('image_url')->store('restaurants', 'public');
-            $validatedData['image_url'] = $imagePath;
+            $data['image_url'] = $request->file('image_url')->store('restaurants', 'public');
         }
 
-        $restaurant = Restaurant::create($validatedData);
+        $restaurant = Restaurant::create($data);
 
-        if (isset($validatedData['image_url'])) {
-            $restaurant->image_url = asset('storage/' . $validatedData['image_url']);
-        }
+        $restaurant->image_url = $restaurant->image_url ? asset('storage/' . $restaurant->image_url) : null;
 
         return response()->json($restaurant, 201);
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        return response()->json(['error' => $e->errors()], 422);
     } catch (\Exception $e) {
-        return response()->json(['error' => 'An unexpected error occurred while creating the restaurant. Please try again later.'], 500);
+        return response()->json(['error' => 'An unexpected error occurred while creating the restaurant.'], 500);
     }
 }
 
@@ -81,35 +83,34 @@ public function update(RestaurantRequest $request, $id)
 {
     try {
         $data = $request->validated();
-
         $restaurant = Restaurant::findOrFail($id);
 
-        if ($request->hasFile('image_url')) {
-            $oldImagePath = str_replace(asset('storage/'), '', $restaurant->image_url);
+        // Ensure that only the owner can update their restaurant
+        if ($restaurant->user_id !== auth()->id()) {
+            return response()->json(['error' => 'Unauthorized action.'], 403);
+        }
 
+        if ($request->hasFile('image_url')) {
+            // Handle image upload
+            $oldImagePath = str_replace(asset('storage/'), '', $restaurant->image_url);
             if (Storage::disk('public')->exists($oldImagePath)) {
                 Storage::disk('public')->delete($oldImagePath);
             }
 
-            $newImagePath = $request->file('image_url')->store('restaurants', 'public');
-            $data['image_url'] = $newImagePath;
+            $data['image_url'] = $request->file('image_url')->store('restaurants', 'public');
         }
 
         $restaurant->update($data);
+        $restaurant->image_url = $restaurant->image_url ? asset('storage/' . $restaurant->image_url) : null;
 
-       // Generate the full URL for the image to return in the response
-       if (isset($data['image_url'])) {
-        $restaurant->image_url = asset('storage/' . $data['image_url']);
-    }
         return response()->json($restaurant, 200);
     } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
         return response()->json(['error' => 'Restaurant not found.'], 404);
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        return response()->json(['error' => $e->errors()], 422);
     } catch (\Exception $e) {
-        return response()->json(['error' => 'An unexpected error occurred while updating the restaurant. Please try again later.'], 500);
+        return response()->json(['error' => 'An unexpected error occurred while updating the restaurant.'], 500);
     }
 }
+
 
 
 public function generateQrCodeForRestaurant($id)

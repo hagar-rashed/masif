@@ -154,6 +154,22 @@ public function update(Request $request, $category_id, $id)
 }
 
 
+
+public function destroy($id)
+{
+    try {
+        $cafeItem = CafeItem::findOrFail($id);
+        $cafeItem->delete();
+        return response()->json(['message' => 'Cafe item deleted successfully.'], 200);
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        return response()->json(['error' => 'Cafe item not found.'], 404);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'An unexpected error occurred. Please try again later.'], 500);
+    }
+}
+
+
+
 public function addToCart(Request $request)
 {
     try {

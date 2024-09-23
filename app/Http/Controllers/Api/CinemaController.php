@@ -52,6 +52,8 @@ class CinemaController extends Controller
         try {
             // Validate the incoming request data
             $validatedData = $request->validated();
+            $validatedData ['user_id'] = auth()->id(); // Assign the currently authenticated user's ID
+
 
             // Handle image upload if present
             if ($request->hasFile('image_url')) {
@@ -80,6 +82,10 @@ class CinemaController extends Controller
 
             // Find the cinema by ID
             $cinema = Cinema::findOrFail($id);
+
+            if ($cinema->user_id !== auth()->id()) {
+                return response()->json(['error' => 'Unauthorized action.'], 403);
+            }
 
             // Check if a new image file is provided
             if ($request->hasFile('image_url')) {

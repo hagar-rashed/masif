@@ -9,6 +9,7 @@ class Tourism extends Model
 {
     use HasFactory;
     protected $fillable = [
+        'user_id',
         'name',
         'image_url',
         'qr_code',

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Cafe;
 use App\Models\CafeCategory;
+use App\Models\CafeItem;
 use Illuminate\Support\Facades\Storage;
 
 
@@ -13,23 +14,29 @@ use Illuminate\Support\Facades\Storage;
 class CafeCategoryController extends Controller
 {
 
+ 
     public function index($id)
-{
-    try {
-        $cafeCategories = CafeCategory::where('cafe_id', $id)->get();
-        foreach ($cafeCategories as $category) {
-            $category->image_url = $category->image_url ? asset('storage/' . $category->image_url) : null;
+    {
+        try {
+            // Get categories for the cafe
+            $cafeCategories = CafeCategory::where('cafe_id', $id)->get();
+            
+            // Loop through each category and set the image URL to just the file path
+            foreach ($cafeCategories as $category) {
+                $category->image_url = $category->image_url ? $category->image_url : null;  // Return only the path, not the full URL
+            }
+    
+            return response()->json($cafeCategories);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'An unexpected error occurred while retrieving categories. Please try again later.'], 500);
         }
-        return response()->json($cafeCategories);
-    } catch (\Exception $e) {
-        return response()->json(['error' => 'An unexpected error occurred while retrieving categories. Please try again later.'], 500);
     }
-}
-
+    
+    
 
     
 
-    public function show($id)
+public function show($id)
 {
     try {
         $cafeCategory = CafeCategory::findOrFail($id);
@@ -41,7 +48,6 @@ class CafeCategoryController extends Controller
         return response()->json(['error' => 'An unexpected error occurred while retrieving the category. Please try again later.'], 500);
     }
 }
-
 
   
      public function store(Request $request, $cafe_id)

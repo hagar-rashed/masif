@@ -12,7 +12,7 @@ class Restaurant extends Model
 protected $table = 'restaurants';
 
 protected $fillable = [
-    'name', 'location', 'latitude', 'longitude', 'opening_time_from', 'opening_time_to','image_url','description',
+    'user_id','name', 'location', 'latitude', 'longitude', 'opening_time_from', 'opening_time_to','image_url','description',
     'phone','rating','delivery_time','busy_rate','menu_qr_code'
    
 ];
@@ -26,6 +26,8 @@ public function categories()
         return $this->hasMany(RestaurantCategory::class);
        
     }
+
+   
 
 }
 

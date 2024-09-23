@@ -234,4 +234,24 @@ public function bookSeats(Request $request)
 
         return $qrCodePath;
     }
+
+
+    public function getScreensByMovie($movie_id)
+{
+    try {
+        // Fetch all screens showing the specific movie, including cinema details
+        $screens = Screen::where('movie_id', $movie_id)
+                         ->with('cinema') // Include cinema details
+                         ->get();
+
+        if ($screens->isEmpty()) {
+            return response()->json(['error' => 'No screens found for the specified movie.'], 404);
+        }
+
+        return response()->json($screens, 200);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'An error occurred while retrieving the screens. Please try again later.'], 500);
+    }
+}
+
 }

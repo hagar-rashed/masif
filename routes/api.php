@@ -198,7 +198,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::delete('/cart/clear', [CartController::class, 'clearCart']);
     Route::delete('/cart/item/{product_id}', [CartController::class, 'deleteCartItem']);
     Route::post('/booktransport', [TransportationController::class, 'book']);///transportbok 30-8
-    Route::get('company/profile/{id}', [CompanyProfileController::class, 'enterpriseProfile']);
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+
     Route::get('company/profile/dashboard', [CompanyProfileController::class, 'dashboardLink']);
     Route::post('store/card/data', [VisitorProfileController::class, 'storeCardData']);
     Route::post('store/wallet/data', [VisitorProfileController::class, 'storeWalletData']);
@@ -366,11 +368,17 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('room-offers', [RoomOfferController::class, 'store']);
     Route::get('room-offers', [RoomOfferController::class, 'index']);
     Route::get('room-offers/{id}', [RoomOfferController::class, 'show']);
-    Route::post('/room-offers/book', [RoomOfferController::class, 'bookRoomOffer']);
+    Route::post('/room-offers/book', [RoomOfferController::class, 'bookRoomOffer']);  
+
+    Route::get('movies/{movie_id}/screens', [ScreenController::class, 'getScreensByMovie']);
+    
+    Route::get('enterprise-profile/{id}', [CompanyProfileController::class, 'enterpriseProfile']);
+    
 
     Route::post('/room-bookings', [RoomBookingController::class, 'store']);
     Route::get('/room-bookings/{id}', [RoomBookingController::class, 'show']);
     Route::delete('/room-bookings/{id}', [RoomBookingController::class, 'destroy']);
+
 
     
 

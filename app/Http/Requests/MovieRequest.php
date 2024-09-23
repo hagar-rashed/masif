@@ -36,8 +36,7 @@ class MovieRequest extends FormRequest
             'runtime' => 'required|regex:/^[0-9]{2}:[0-5][0-9]$/', // Validate hh:mm format
             'director' => 'required|string|max:255',
             'cast' => 'required|string',
-            'adult_price' => 'required|numeric|min:0',  
-            'child_price' => 'required|numeric|min:0'
+            
         ];
     }
 }

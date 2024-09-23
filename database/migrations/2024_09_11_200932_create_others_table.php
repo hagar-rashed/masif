@@ -16,6 +16,7 @@ class CreateOthersTable extends Migration
         Schema::create('others', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); 
             $table->string('image')->nullable();
             $table->string('phone')->nullable();
             $table->string('location')->nullable();

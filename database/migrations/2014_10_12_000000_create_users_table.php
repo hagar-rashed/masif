@@ -28,7 +28,7 @@ class CreateUsersTable extends Migration
             $table->decimal('longitude', 11, 8)->nullable(); // Add longitude
             $table->string('commercial_record')->nullable(); // Add commercial record
             $table->string('tax_card')->nullable(); // Add tax card
-            $table->enum('company_activity', ['restaurant', 'cafe', 'cinema','tourism','hotel','market','other']); // Restrict company activity            
+            $table->enum('company_activity', ['restaurant', 'cafe', 'cinema','tourism','hotel','market','other'])->nullable(); // Restrict company activity            
             $table->string('social_id')->nullable();
             $table->string('social_type')->nullable();
             $table->rememberToken();

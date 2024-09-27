@@ -22,4 +22,6 @@ class LocaleMiddleware
         }
         return $next($request);
     }
+
+
 }

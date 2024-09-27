@@ -45,72 +45,62 @@ public function store(Request $request, $restaurant_id)
     // Validate the incoming request data
     $validatedData = $request->validate([
         'name' => 'required|string|max:255',
-        'image_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validate as an image with specific mime types and max size
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validate image upload
     ]);
 
-    // Find the cafe by ID
+    // Find the restaurant by ID
     $restaurant = Restaurant::findOrFail($restaurant_id);
 
     // Prepare the data to be saved
     $categoryData = [
         'name' => $validatedData['name'],
-        'restaurant_id' => $restaurant->id, // Ensure cafe_id is set
+        'restaurant_id' => $restaurant->id,
     ];
 
     // Check if an image was uploaded
     if ($request->hasFile('image')) {
-        // Store the new image in the 'public/cafe' directory
         $imagePath = $request->file('image')->store('restaurant', 'public');
         $categoryData['image_url'] = $imagePath;
     }
 
-    // Create a new category with the validated data
+    // Create the category
     $category = RestaurantCategory::create($categoryData);
-
-    // Optionally, return the image URL
-    if (isset($categoryData['image_url'])) {
-        $category->image_url = asset('storage/' . $categoryData['image_url']);
-    }
-
-    // Return the created category as a JSON response
+    
     return response()->json($category, 201);
 }
+
 
 public function update(Request $request, $restaurant_id, $category_id)
 {
     // Validate the incoming request data
     $validatedData = $request->validate([
         'name' => 'required|string|max:255',
-        'image_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validate as an image with specific mime types and max size
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
     ]);
 
-    // Find the restaurant by ID
+    // Find the restaurant and category
     $restaurant = Restaurant::findOrFail($restaurant_id);
-
-    // Find the category by ID
     $category = RestaurantCategory::where('restaurant_id', $restaurant->id)->findOrFail($category_id);
 
-    // Prepare the data to be updated
+    // Prepare data for update
     $categoryData = [
         'name' => $validatedData['name'],
     ];
 
-    // Check if an image was uploaded
-    if ($request->hasFile('image_url')) {
-        // Store the new image in the 'public/restaurant' directory
-        $imagePath = $request->file('image_url')->store('restaurant', 'public');
+    // Check if an image is uploaded and handle the previous image
+    if ($request->hasFile('image')) {
+        // Delete old image if it exists
+        if ($category->image_url && Storage::disk('public')->exists($category->image_url)) {
+            Storage::disk('public')->delete($category->image_url);
+        }
+        // Store the new image
+        $imagePath = $request->file('image')->store('restaurant', 'public');
         $categoryData['image_url'] = $imagePath;
     }
 
-    // Update the category with the validated data
+    // Update the category
     $category->update($categoryData);
-
-    // Ensure the complete image URL is included in the response
-    $category->image_url = isset($categoryData['image_url']) 
-        ? asset('storage/' . $categoryData['image_url']) 
-        : asset('storage/' . $category->image_url);
-
-    // Return the updated category as a JSON response
+    
     return response()->json($category, 200);
 }
 
@@ -123,14 +113,16 @@ public function destroy($id)
     try {
         $category = RestaurantCategory::findOrFail($id);
 
+        // Delete the image if it exists
         if ($category->image_url) {
-            $imagePath = str_replace(asset('storage/'), '', $category->image_url);
+            $imagePath = $category->image_url; // Directly use the stored image path
 
             if (Storage::disk('public')->exists($imagePath)) {
                 Storage::disk('public')->delete($imagePath);
             }
         }
 
+        // Delete the category
         $category->delete();
 
         return response()->json(['message' => 'Category and associated data deleted successfully.'], 200);
@@ -140,4 +132,5 @@ public function destroy($id)
         return response()->json(['error' => 'An unexpected error occurred while deleting the category. Please try again later.'], 500);
     }
 }
+
 }

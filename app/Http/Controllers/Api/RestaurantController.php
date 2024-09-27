@@ -23,12 +23,11 @@ class RestaurantController extends Controller
             $restaurants = Restaurant::with(['categories'])->get();
     
             $restaurants->each(function ($restaurant) {
-                // Format restaurant image URL
-                $restaurant->image_url = $restaurant->image_url ? asset('storage/' . $restaurant->image_url) : null;
+                // Return only the image path, not the full URL
+                $restaurant->image_url = $restaurant->image_url ? '' . $restaurant->image_url : null;
                 
-                // Format category image URLs
                 $restaurant->categories->each(function ($category) {
-                    $category->image_url = $category->image_url ? asset('storage/' . $category->image_url) : null;
+                    $category->image_url = $category->image_url ? 'categories/' . $category->image_url : null;
                 });
             });
     
@@ -39,23 +38,23 @@ class RestaurantController extends Controller
     }
     
     
+    
 
-public function show($id)
-{
-    try {
-        $restaurant = Restaurant::with(['categories.items'])->findOrFail($id);
-        // Add the full image URL to the restaurant object
-        $restaurant->image_url = $restaurant->image_url ? asset('storage/' . $restaurant->image_url) : null;
-          
-       
-        return response()->json($restaurant, 200);
-    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-        return response()->json(['error' => 'Restaurant not found.'], 404);
-    } catch (\Exception $e) {
-        return response()->json(['error' => 'An unexpected error occurred while retrieving the restaurant. Please try again later.'], 500);
+    public function show($id)
+    {
+        try {
+            $restaurant = Restaurant::with(['categories.items'])->findOrFail($id);
+            // Return only the image path, not the full URL
+            $restaurant->image_url = $restaurant->image_url ? '' . $restaurant->image_url : null;
+    
+            return response()->json($restaurant, 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['error' => 'Restaurant not found.'], 404);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'An unexpected error occurred while retrieving the restaurant. Please try again later.'], 500);
+        }
     }
-}
-
+    
 
 public function store(RestaurantRequest $request)
 {
@@ -69,7 +68,8 @@ public function store(RestaurantRequest $request)
 
         $restaurant = Restaurant::create($data);
 
-        $restaurant->image_url = $restaurant->image_url ? asset('storage/' . $restaurant->image_url) : null;
+        $restaurant->image_url = $restaurant->image_url ? '' . $restaurant->image_url : null;
+
 
         return response()->json($restaurant, 201);
     } catch (\Exception $e) {
@@ -101,7 +101,7 @@ public function update(RestaurantRequest $request, $id)
         }
 
         $restaurant->update($data);
-        $restaurant->image_url = $restaurant->image_url ? asset('storage/' . $restaurant->image_url) : null;
+        $restaurant->image_url = $restaurant->image_url ? '' . $restaurant->image_url : null;
 
         return response()->json($restaurant, 200);
     } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {

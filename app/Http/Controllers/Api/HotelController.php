@@ -227,18 +227,28 @@ class HotelController extends Controller
             'star_rating.integer' => 'The star rating must be an integer.',
         ];
     }
-
     public function rooms($id) {
         // Find the hotel by ID
-        $hotel = Hotel::find($id);
-
+        $hotel = Hotel::with('rooms.images')->find($id); // Load rooms with their images
+    
         if (!$hotel) {
             return response()->json(['error' => 'Hotel not found'], 404);
         }
-
-        // Get rooms associated with the hotel
-        $rooms = $hotel->rooms; // Assuming the Hotel model has a relationship with Room
-
-        return response()->json($rooms);
+    
+        // Get rooms associated with the hotel, including images
+        $rooms = $hotel->rooms; 
+    
+        // Format the image paths for each room
+        $rooms->each(function ($room) {
+            $room->images->each(function ($image) {
+                $image->image_path = '' . $image->image_path; // Ensure image path is formatted correctly
+            });
+        });
+    
+        return response()->json([
+            'message' => 'Rooms retrieved successfully',
+            'data' => $rooms,
+        ], 200);
     }
+    
 }

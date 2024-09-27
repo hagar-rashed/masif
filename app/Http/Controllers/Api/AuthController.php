@@ -105,8 +105,9 @@ class AuthController extends Controller
             'user_type' => 'required|string|in:company,owner,visitor',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'location' => 'nullable|string|max:255',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
+            // Latitude and Longitude are required only for company or owner, not visitor
+            'latitude' => 'required_if:user_type,company,owner|nullable|numeric',
+            'longitude' => 'required_if:user_type,company,owner|nullable|numeric',
             'commercial_record' => 'nullable|string|max:255',
             'tax_card' => 'nullable|string|max:255',
             'company_activity' => [
@@ -116,11 +117,11 @@ class AuthController extends Controller
                 'in:restaurant,cafe,cinema,tourism,hotel,market,other'
             ],
         ]);
-
+    
         try {
             // Handle the image upload
             $imagePath = $request->hasFile('image') ? $request->file('image')->store('images', 'public') : null;
-
+    
             // Create the user
             $user = User::create([
                 'name' => $request->name,
@@ -135,13 +136,13 @@ class AuthController extends Controller
                 'tax_card' => $request->tax_card ?? null,
                 'company_activity' => $request->company_activity ?? null,
             ]);
-
+    
             // Generate and save QR code
             $qrCode = QrCode::format('png')->size(300)->generate((string)$user->id);
             $qrCodePath = 'profile/user_' . uniqid() . '.png';
             Storage::disk('public')->put($qrCodePath, $qrCode);
             $user->update(['code' => $qrCodePath]);
-
+    
             // Prepare response data
             $responseData = [
                 'status' => 'User Registered',
@@ -163,9 +164,9 @@ class AuthController extends Controller
                     'updated_at' => $user->updated_at->toIso8601String(),
                 ]
             ];
-
+    
             return response()->json($responseData, 201);
-
+    
         } catch (Exception $e) {
             return response()->json([
                 'status' => 'Registration Failed',
@@ -173,8 +174,7 @@ class AuthController extends Controller
             ], 500);
         }
     }
-
-
+    
 
     public function logout_user(){
         Auth::user()->currentAccessToken()->delete();

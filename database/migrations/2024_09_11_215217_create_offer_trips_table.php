@@ -21,8 +21,8 @@ class CreateOfferTripsTable extends Migration
             $table->foreign('tourism_id')->references('id')->on('tourisms')->onDelete('cascade'); // Add this line
             $table->string('name'); 
             $table->string('image_path')->nullable();  // Make this nullable            
-            $table->text('description');  // Trip description
-            $table->float('rating')->default(0);  // Trip rating
+            $table->text('description');  
+            $table->float('rating')->default(0);  
             $table->integer('reviews_count')->default(0);  // Number of reviews
             $table->dateTime('start_time');  // Start time of the trip
             $table->dateTime('end_time');  // End time of the trip
@@ -30,11 +30,13 @@ class CreateOfferTripsTable extends Migration
             $table->text('trip_schedule');  // Trip schedule
             $table->string('transportation');  // Transportation info
             $table->string('hotel_name');  // Hotel or accommodation name
-            $table->string('hotel_address');  // Hotel address
+            $table->string('hotel_address');  
             $table->string('hotel_phone')->nullable();
-            $table->decimal('trip_cost', 10, 2);  // Bus cost
-            $table->decimal('tax', 10, 2);  // Tax
-            $table->decimal('total_cost', 10, 2);  // Total cost
+            $table->decimal('cost_before_discount', 10, 2)->nullable();  
+            $table->decimal('trip_cost', 10, 2);  
+            $table->decimal('tax', 10, 2);  
+            $table->decimal('total_cost', 10, 2);  
+            
             $table->timestamps();
         });
     }

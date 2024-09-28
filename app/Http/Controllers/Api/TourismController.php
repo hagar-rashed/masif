@@ -7,8 +7,10 @@ use App\Models\OfferTrip;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
-use SimpleSoftwareIO\QrCode\Facades\QrCode; 
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Validation\ValidationException;
 
 class TourismController extends Controller
 {
@@ -27,89 +29,77 @@ class TourismController extends Controller
     }
 
     // Store a new tourism entry
-   // Store a new tourism entry
-   public function store(Request $request)
-   {
-       try {
-           $validated = $request->validate([
-               'name' => 'required|string',
-               'image_url' => 'file|image|nullable',
-               'phone' => 'required|string',
-               'location' => 'required|string',
-               'latitude' => 'required|numeric',
-               'longitude' => 'required|numeric',
-               'description' => 'required|string',
-               'facilities' => 'required|array',
-               'facilities.*' => 'string',
-               'rating' => 'required|numeric|min:0|max:5',
-           ], $this->validationMessages());
+    public function store(Request $request)
+    {
+        try {
+            // Validate request data
+            $validated = $request->validate([
+                'name' => 'required|string',
+                'image_url' => 'file|image|nullable',
+                'phone' => 'required|string',
+                'location' => 'required|string',
+                'latitude' => 'required|numeric',
+                'longitude' => 'required|numeric',
+                'description' => 'required|string',
+                'facilities' => 'required|array',
+                'facilities.*' => 'string',
+                'rating' => 'required|numeric|min:0|max:5',
+            ]);
 
-           // Handle image upload if present
-           if ($request->hasFile('image_url')) {
-               $imagePath = $request->file('image_url')->store('tourisms', 'public');
-               $validated['image_url'] = str_replace('public/', '', $imagePath); // Store path without 'public/'
-           }
+            // Handle image upload if present
+            if ($request->hasFile('image_url')) {
+                $imagePath = $request->file('image_url')->store('tourisms', 'public');
+                $validated['image_url'] = str_replace('public/', '', $imagePath);
+            }
 
-           // Create the tourism entry
-           $tourism = Tourism::create($validated);
+            // Add the authenticated user’s ID
+            $validated['user_id'] = Auth::id(); // Adding user_id from authenticated user
 
-           // Generate the QR code for the tourism data
-           $qrCodeData = [
-               'name' => $tourism->name,
-               'location' => $tourism->location,
-               'phone' => $tourism->phone,
-               'latitude' => $tourism->latitude,
-               'longitude' => $tourism->longitude,
-               'description' => $tourism->description,
-               'facilities' => $tourism->facilities,
-               'rating' => $tourism->rating,
-           ];
+            // Create the tourism entry
+            $tourism = Tourism::create($validated);
 
-           // Convert the data to a JSON string for QR code
-           $qrCodeString = json_encode($qrCodeData);
+            // Generate the QR code for the tourism data
+            $qrCodeData = [
+                'name' => $tourism->name,
+                'location' => $tourism->location,
+                'phone' => $tourism->phone,
+                'latitude' => $tourism->latitude,
+                'longitude' => $tourism->longitude,
+                'description' => $tourism->description,
+                'facilities' => $tourism->facilities,
+                'rating' => $tourism->rating,
+            ];
 
-           // Generate and store the QR code
-           $qrCodePath = 'qrcodes/tourism_' . $tourism->id . '.png';
-           QrCode::format('png')->size(200)->generate($qrCodeString, public_path('storage/' . $qrCodePath));
+            // Convert the data to a JSON string for the QR code
+            $qrCodeString = json_encode($qrCodeData);
 
-           // Save the QR code path in the database
-           $tourism->update(['qr_code' => $qrCodePath]);
+            // Generate and store the QR code
+            $qrCodePath = 'qrcodes/tourism_' . $tourism->id . '.png';
+            QrCode::format('png')->size(200)->generate($qrCodeString, public_path('storage/' . $qrCodePath));
 
-           // Format image path
-           $tourism->image_url = $validated['image_url'] ?? null;
-           $tourism->qr_code_url = $tourism->qr_code;
+            // Save the QR code path in the database
+            $tourism->update(['qr_code' => $qrCodePath]);
 
-           return response()->json([
-               'message' => 'Tourism created successfully',
-               'data' => $tourism,
-           ], 201);
-       } catch (ValidationException $e) {
-           return response()->json([
-               'error' => 'Validation error',
-               'message' => $e->errors(),
-           ], 422);
-       } catch (\Exception $e) {
-           return response()->json([
-               'error' => 'An error occurred while creating the tourism entry',
-               'message' => $e->getMessage(),
-           ], 500);
-       }
-   }
+            // Format image path
+            $tourism->image_url = $validated['image_url'] ?? null;
+            $tourism->qr_code_url = $tourism->qr_code;
 
-   private function validationMessages() {
-       return [
-           'name.required' => 'The tourism name is required.',
-           'image_url.file' => 'The image must be a valid file.',
-           'phone.required' => 'The phone number is required.',
-           'location.required' => 'The location is required.',
-           'latitude.required' => 'The latitude is required.',
-           'longitude.required' => 'The longitude is required.',
-           'description.required' => 'The description is required.',
-           'facilities.required' => 'The facilities are required.',
-           'rating.required' => 'The rating is required.',
-       ];
-   }
-
+            return response()->json([
+                'message' => 'Tourism created successfully',
+                'data' => $tourism,
+            ], 201);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Validation error',
+                'message' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'An error occurred while creating the tourism entry',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
 
     // Update a tourism entry
     public function update(Request $request, $id)
@@ -127,7 +117,7 @@ class TourismController extends Controller
             'location' => 'sometimes|string',
             'latitude' => 'sometimes|numeric',
             'longitude' => 'sometimes|numeric',
-            'description' => 'sometimes',
+            'description' => 'sometimes|string',
             'facilities' => 'sometimes|array',
             'facilities.*' => 'string',
             'rating' => 'sometimes|numeric|min:0|max:5',

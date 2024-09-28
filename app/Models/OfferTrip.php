@@ -28,6 +28,7 @@ class OfferTrip extends Model
         'trip_cost',
         'tax',
         'total_cost',
+        'cost_before_discount',
     ];
 
     public function user()

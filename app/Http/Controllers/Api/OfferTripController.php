@@ -40,6 +40,8 @@ class OfferTripController extends Controller
 }
 
 
+
+
 public function show($id)
 {
     try {
@@ -85,6 +87,7 @@ public function show($id)
                 'hotel_phone' => 'nullable|string|max:15',
                 'trip_cost' => 'required|numeric',
                 'tax' => 'required|numeric',
+                'cost_before_discount' => 'nullable|numeric', // Ensure it's validated if optional
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
             ]);
     
@@ -114,7 +117,7 @@ public function show($id)
     
             return response()->json([
                 'message' => 'Trip created successfully.',
-                'data' => $trip->only(['id', 'user_id', 'tourism_id', 'name', 'image_path', 'description', 'rating', 'reviews_count', 'start_time', 'end_time', 'destination', 'trip_schedule', 'transportation', 'hotel_name', 'hotel_address', 'hotel_phone', 'trip_cost', 'tax', 'total_cost', 'created_at', 'updated_at'])
+                'data' => $trip->only(['id', 'user_id', 'tourism_id', 'name', 'image_path', 'description', 'rating', 'reviews_count', 'start_time', 'end_time', 'destination', 'trip_schedule', 'transportation', 'hotel_name', 'hotel_address', 'hotel_phone','cost_before_discount', 'trip_cost', 'tax','total_cost', 'created_at', 'updated_at'])
             ], 201);
         } catch (ValidationException $e) {
             return response()->json([
@@ -154,6 +157,8 @@ public function show($id)
                 'hotel_phone' => 'nullable|string|max:15',
                 'trip_cost' => 'required|numeric',
                 'tax' => 'required|numeric',
+                'cost_before_discount' => 'nullable|numeric',
+
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
             ]);
     
@@ -265,6 +270,34 @@ public function getAuthenticatedUserTrips()
     }
 }
 
+public function getTripsWithOffers()
+{
+
+try {
+    // Retrieve only trips where 'cost_before_discount' is not null
+    $trips = OfferTrip::with('tourism')
+        ->whereNotNull('cost_before_discount')
+        ->get();
+
+    return response()->json([
+        'message' => 'Trips with offers retrieved successfully.',
+        'data' => $trips
+    ], 200);
+} catch (Exception $e) {
+    return response()->json([
+        'error' => 'An unexpected error occurred while retrieving trips.',
+        'exception' => get_class($e),
+        'message' => $e->getMessage(),
+        'file' => $e->getFile(),
+        'line' => $e->getLine(),
+        'trace' => $e->getTraceAsString()
+    ], 500);
+}
+}
+}
+
+
+
    
     
-}    
+    

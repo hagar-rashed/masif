@@ -150,6 +150,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('trip-notification/{id}/read', [NotificationController::class, 'markAsRead']);
     Route::post('trips/{trip_offer}/book', [TripBookingController::class, 'store']);
 
+    Route::get('/trips-offers', [OfferTripController::class, 'getTripsWithOffers']);
+
     Route::get('others', [OtherController::class, 'index']);
     Route::post('others', [OtherController::class, 'store']);
     Route::get('others/{id}', [OtherController::class, 'show']);
